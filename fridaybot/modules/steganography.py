@@ -48,7 +48,7 @@ async def hmm(event):
     crypto_steganography = CryptoSteganography("hell")
     crypto_steganography.hide(img, "./fridaydevs/stegano.png", text)
     file_name = "stegano.png"
-    ok = "./fridaydevs/" + file_name
+    ok = f"./fridaydevs/{file_name}"
     await borg.send_file(
         event.chat_id,
         ok,

@@ -12,7 +12,7 @@ async def _(event):
         return
     input_str = event.pattern_match.group(1)
     result = RottenTomatoesClient.search(term=input_str, limit=1)
-    
+
     l = result.get("movies")[0]
     name = l.get("name")
     year = l.get("year")
@@ -22,9 +22,7 @@ async def _(event):
     ullu = l.get("url")
     url = f"http://rottentomatoes.com{ullu}"
     Ceset = l.get("castItems")
-    cast = ""
-    for Hitler in Ceset:
-      cast += Hitler.get("name") +"\n"
+    cast = "".join(Hitler.get("name") +"\n" for Hitler in Ceset)
     caption = f"""Name : {name}
 Year Of Release : {year}
 Link : {url}

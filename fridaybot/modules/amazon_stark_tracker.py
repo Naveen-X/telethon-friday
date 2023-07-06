@@ -59,11 +59,11 @@ async def _(event):
         await event.edit("**Tracker Not Found In Db**")
         return
     rm_tracker(str(url))
-    await event.edit(f"**Sucessfully Removed From TrackerList**")
+    await event.edit("**Sucessfully Removed From TrackerList**")
     
 async def track_amazon():
     headers = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'}
-    ws = get_all_urls() 
+    ws = get_all_urls()
     if len(ws) == 0:
         return
     kk = get_all_tracker()
@@ -78,8 +78,6 @@ async def track_amazon():
         if (int(price) > int(ujwal.budget)):
             await borg.send_message(Config.PRIVATE_GROUP_ID, f"#Tracker - Price Reduced \nProduct Name : {title} \nCurrent price : {price}")
             rm_tracker(str(ujwal.amazon_url))
-        else:
-            pass
 
 scheduler = AsyncIOScheduler(timezone="Asia/Kolkata")
 scheduler.add_job(track_amazon, trigger="cron", hour=9)

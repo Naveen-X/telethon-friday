@@ -65,7 +65,7 @@ LASTFM_SECRET = os.environ.get("LASTFM_SECRET", None)
 LASTFM_USERNAME = os.environ.get("LASTFM_USERNAME", None)
 LASTFM_PASSWORD_PLAIN = os.environ.get("LASTFM_PASSWORD", None)
 LASTFM_PASS = pylast.md5(LASTFM_PASSWORD_PLAIN)
-if not LASTFM_USERNAME == "None":
+if LASTFM_USERNAME != "None":
     lastfm = pylast.LastFMNetwork(
     api_key=LASTFM_API,
     api_secret=LASTFM_SECRET,
@@ -95,14 +95,12 @@ AFKREASON = None
 link = "https://people.eecs.berkeley.edu/~rich.zhang/projects/2016_colorization/files/demo_v2/colorization_release_v2.caffemodel"
 km = "./resources/imgcolour/colorization_release_v2.caffemodel"
 pathz = "./resources/imgcolour/"
-if os.path.exists(km):
-    pass
-else:
+if not os.path.exists(km):
     try:
         sedlyf = wget.download(link, out=pathz)
     except:
         sedprint.info("I Wasn't Able To Download Cafee Model. Skipping.")
-if Config.NOSPAMPLUS_TOKEN == None:
+if Config.NOSPAMPLUS_TOKEN is None:
     sclient = None
     sedprint.info("[Warning] - NoSpamPlusToken is None")
 else:
@@ -110,7 +108,7 @@ else:
         sclient = Connect(Config.NOSPAMPLUS_TOKEN)
     except Exception as e:
         sclient = None
-        sedprint.info("[Warning] - " + str(e))    
+        sedprint.info(f"[Warning] - {str(e)}")
 try:
     if not os.path.isdir(Config.TMP_DOWNLOAD_DIRECTORY):
         os.makedirs(Config.TMP_DOWNLOAD_DIRECTORY)

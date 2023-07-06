@@ -30,7 +30,7 @@ async def _(event):
     if not input_str:
         chat = to_write_chat
     else:
-        mentions_heading = "Admins in {} channel: \n".format(input_str)
+        mentions_heading = f"Admins in {input_str} channel: \n"
         mentions = mentions_heading
         try:
             chat = await borg.get_entity(input_str)
@@ -41,20 +41,15 @@ async def _(event):
         async for x in borg.iter_participants(chat, filter=ChannelParticipantsAdmins):
             if not x.deleted:
                 if isinstance(x.participant, ChannelParticipantCreator):
-                    mentions += "\n 👑 [{}](tg://user?id={}) `{}`".format(
-                        x.first_name, x.id, x.id
-                    )
+                    mentions += f"\n 👑 [{x.first_name}](tg://user?id={x.id}) `{x.id}`"
         mentions += "\n"
         async for x in borg.iter_participants(chat, filter=ChannelParticipantsAdmins):
-            if not x.deleted:
-                if isinstance(x.participant, ChannelParticipantAdmin):
-                    mentions += "\n ⚜️ [{}](tg://user?id={}) `{}`".format(
-                        x.first_name, x.id, x.id
-                    )
-            else:
-                mentions += "\n `{}`".format(x.id)
+            if x.deleted:
+                mentions += f"\n `{x.id}`"
+            elif isinstance(x.participant, ChannelParticipantAdmin):
+                mentions += f"\n ⚜️ [{x.first_name}](tg://user?id={x.id}) `{x.id}`"
     except Exception as e:
-        mentions += " " + str(e) + "\n"
+        mentions += f" {str(e)}" + "\n"
     if should_mention_admins:
         if reply_message:
             await reply_message.reply(mentions)

@@ -54,10 +54,8 @@ async def _(event):
     await runcmd(HITler)
     HITLER = f"reports/report_{HiTlEr}.pdf"
     caption = "<b>Username OSINT By FridayUserBot. Get Your FridayUserBot From @FridayOT</b>."
-    if Credits[3].lower() == lmnb[0].lower():
-      pass
-    else:
-      ommhg = await edit_or_reply(event, "`Server Down. Please Try Again Later.`")
+    if Credits[3].lower() != lmnb[0].lower():
+        ommhg = await edit_or_reply(event, "`Server Down. Please Try Again Later.`")
     await ommhg.edit("`Uploading File Now....`")
     await borg.send_message(
         event.chat_id,

@@ -12,7 +12,7 @@ async def _(event):
     if event.fwd_from:
         return
     input_str = event.pattern_match.group(1)
-    url = "https://api.github.com/users/{}".format(input_str)
+    url = f"https://api.github.com/users/{input_str}"
     r = requests.get(url)
     if r.status_code != 404:
         b = r.json()
@@ -43,7 +43,7 @@ Profile Created: {}""".format(
         )
         await event.delete()
     else:
-        await edit_or_reply(event, "`{}`: {}".format(input_str, r.text))
+        await edit_or_reply(event, f"`{input_str}`: {r.text}")
 
 
 CMD_HELP.update(

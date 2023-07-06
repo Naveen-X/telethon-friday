@@ -67,7 +67,7 @@ async def okgoogle(img):
             return
 
         os.remove(name)
-        match = await ParseSauce(fetchUrl + "&preferences?hl=en&fg=1#languages")
+        match = await ParseSauce(f"{fetchUrl}&preferences?hl=en&fg=1#languages")
         guess = match["best_guess"]
         imgspage = match["similar_images"]
 
@@ -80,7 +80,7 @@ async def okgoogle(img):
         try:
             lim = lim[0]
             lim = lim.replace("lim=", "")
-            guess = guess.replace("lim=" + lim[0], "")
+            guess = guess.replace(f"lim={lim[0]}", "")
         except IndexError:
             lim = 5
         response = googleimagesdownload()

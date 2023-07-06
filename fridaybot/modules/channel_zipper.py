@@ -27,11 +27,8 @@ async def starky(event):
     media_count = 0
     text_count = 0
     os.makedirs(dir)
-    if un:
-        chnnl = un
-    else:
-        chnnl = event.chat_id
-    await event.edit(f"**Fetching All Files From This Channel**")
+    chnnl = un if un else event.chat_id
+    await event.edit("**Fetching All Files From This Channel**")
     try:
         chnnl_msgs = await borg.get_messages(chnnl, limit=3000)
     except:

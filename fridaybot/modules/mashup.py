@@ -25,7 +25,7 @@ async def _(event):
             response = conv.wait_event(
                 events.NewMessage(incoming=True, from_users=285336877)
             )
-            await event.client.send_message(chat, "{}".format(input_str))
+            await event.client.send_message(chat, f"{input_str}")
             response = await response
         except YouBlockedUserError:
             await event.reply("Unblock @vixtbot")
@@ -52,7 +52,7 @@ async def _(event):
             response = conv.wait_event(
                 events.NewMessage(incoming=True, from_users=285336877)
             )
-            await event.client.send_message(chat, "{}".format(input_str))
+            await event.client.send_message(chat, f"{input_str}")
             response = await response
         except YouBlockedUserError:
             await event.reply("Unblock @vixtbot")

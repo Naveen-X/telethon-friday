@@ -76,7 +76,7 @@ async def hmm(event):
         "./resources/imgcolour/colouregex.prototxt",
         "./resources/imgcolour/colorization_release_v2.caffemodel",
     )
-    
+
     pts = np.load("./resources/imgcolour/pts_in_hull.npy")
     class8 = net.getLayerId("class8_ab")
     conv8 = net.getLayerId("conv8_313_rh")
@@ -98,7 +98,7 @@ async def hmm(event):
     colorized = np.clip(colorized, 0, 1)
     colorized = (255 * colorized).astype("uint8")
     file_name = "Colour.png"
-    ok = sedpath + "/" + file_name
+    ok = f"{sedpath}/{file_name}"
     cv2.imwrite(ok, colorized)
     await borg.send_file(event.chat_id, ok)
     await hmmu.delete()
@@ -129,7 +129,7 @@ async def hmm(event):
     if event.fwd_from:
         return
     life = Config.DEEP_API_KEY
-    if life == None:
+    if life is None:
         life = "quickstart-QUdJIGlzIGNvbWluZy4uLi4K"
         await event.edit("No Api Key Found, Please Add it. For Now Using Local Key")
     if not event.reply_to_msg_id:
@@ -247,7 +247,7 @@ async def iamthug(event):
         offset = (x, y)
         background.paste(mask, offset, mask=mask)
     file_name = "fridaythug.png"
-    ok = sedpath + "/" + file_name
+    ok = f"{sedpath}/{file_name}"
     background.save(ok, "PNG")
     await borg.send_file(event.chat_id, ok)
     await hmm.delete()
@@ -280,7 +280,7 @@ async def iamnone(event):
         offset = (x, y)
         background.paste(mask, offset, mask=mask)
     file_name = "masked_img.png"
-    ok = sedpath + "/" + file_name
+    ok = f"{sedpath}/{file_name}"
     background.save(ok, "PNG")
     await borg.send_file(event.chat_id, ok)
     await hmm.delete()
@@ -306,7 +306,7 @@ async def toony(event):
     )  ## Cartoonify process.
     # Save it
     file_name = "Tooned.png"
-    ok = sedpath + "/" + file_name
+    ok = f"{sedpath}/{file_name}"
     cv2.imwrite(ok, cartoon_image_style_2)
     # Upload it
     await borg.send_file(event.chat_id, ok)
@@ -390,17 +390,14 @@ async def lolmetrg(event):
     hmm_s = await event.client(GetFullUserRequest(sed.sender_id))
     if not hmm_s.profile_photo:
         imglink = 'https://telegra.ph/file/b9684cda357dfbe6f5748.jpg'
-    elif hmm_s.profile_photo:
+    else:
         img = await borg.download_media(hmm_s.profile_photo, sedpath)
         url_s = upload_file(img)
         imglink = f"https://telegra.ph{url_s[0]}"
     first_name = html.escape(hmm_s.user.first_name)
     if first_name is not None:
         first_name = first_name.replace("\u2060", "")
-    if sed.text is None:
-        comment = 'Give Some Text'
-    else:
-        comment = sed.raw_text
+    comment = 'Give Some Text' if sed.text is None else sed.raw_text
     lolul = f"https://some-random-api.ml/canvas/youtube-comment?avatar={imglink}&username={first_name}&comment={comment}"
     r = requests.get(lolul)
     open("ytc.png", "wb").write(r.content)
@@ -437,7 +434,7 @@ async def hmm(event):
     background.save("./starkgangz/testing.png")
 
     file_name = "testing.png"
-    ok = "./starkgangz/" + file_name
+    ok = f"./starkgangz/{file_name}"
     await borg.send_file(event.chat_id, ok)
     await hmmu.delete()
     for files in (ok, img):
@@ -462,7 +459,7 @@ async def hmm(event):
 
     cv2.imwrite("./starkgangz/testing.png", gray_img)
     file_name = "testing.png"
-    ok = "./starkgangz/" + file_name
+    ok = f"./starkgangz/{file_name}"
     await borg.send_file(event.chat_id, ok)
     await hmmu.delete()
     for files in (ok, img):
@@ -496,7 +493,7 @@ async def img(event):
     drawing.text((450, 258), result, fill=blue, font=font1)
     drawing.text((270, 37), search, fill=black, font=font2)
     file_name = "fgs.jpg"
-    ok = sedpath + "/" + file_name
+    ok = f"{sedpath}/{file_name}"
     photo.save(ok)
     await event.delete()
     await friday.send_file(event.chat_id, ok)
@@ -513,14 +510,13 @@ async def lottiepie(event):
     message = await event.get_reply_message()
     if message.media and message.media.document:
         mime_type = message.media.document.mime_type
-        if not "tgsticker" in mime_type:
+        if "tgsticker" not in mime_type:
             await event.edit("Not Supported Yet.")
             return
         await message.download_media("tgs.tgs")
         await runcmd("lottie_convert.py tgs.tgs json.json")
-        json = open("json.json", "r")
-        jsn = json.read()
-        json.close()
+        with open("json.json", "r") as json:
+            jsn = json.read()
         jsn = (
             jsn.replace("[1]", "[2]")
             .replace("[2]", "[3]")
@@ -530,7 +526,7 @@ async def lottiepie(event):
         )
         open("json.json", "w").write(jsn)
         await event.delete()
-        await runcmd(f"lottie_convert.py json.json tgs.tgs")
+        await runcmd("lottie_convert.py json.json tgs.tgs")
         await borg.send_file(event.chat_id, file="tgs.tgs", force_document=False)
         os.remove("json.json")
         os.remove("tgs.tgs")
@@ -561,7 +557,7 @@ async def img(event):
 
     img.save("./starkgangz/testpb.jpg")
     file_name = "testpb.jpg"
-    ok = "./starkgangz/" + file_name
+    ok = f"./starkgangz/{file_name}"
     await borg.send_file(event.chat_id, ok)
     os.remove(files)
     for files in (ok, img):
@@ -589,15 +585,12 @@ async def spinshit(message):
     if int(lolshit) > 6:
         await message.edit("`Only Speed from 1-6 Is Allowded !`")
         return
-    keke = str(lolshit)
     if not reply:
         await message.edit("`Reply To Media First !`")
         return
     else:
-        if lolshit:
-            step = lmaodict.get(keke)
-        else:
-            step = 1
+        keke = str(lolshit)
+        step = lmaodict.get(keke) if lolshit else 1
     pic_loc = await convert_to_image(message, borg)
     if not pic_loc:
         await message.edit("`Reply to a valid media first.`")
@@ -614,7 +607,7 @@ async def spinshit(message):
     # Rotating pic by given angle and saving
     for k, nums in enumerate(range(1, 360, step), start=0):
         y = im.rotate(nums * spin_dir)
-        y.save(os.path.join(path, "spinx%s.jpg" % k))
+        y.save(os.path.join(path, f"spinx{k}.jpg"))
     output_vid = os.path.join(path, "out.mp4")
     # ;__; Maths lol, y = mx + c
     frate = int(((90 / 59) * step) + (1680 / 59))
@@ -662,7 +655,7 @@ async def hmm(event):
 
     im.save("./starkgangz/livenews.png")
     file_name = "livenews.png"
-    ok = "./starkgangz/" + file_name
+    ok = f"./starkgangz/{file_name}"
     await borg.send_file(event.chat_id, ok)
     await hmmu.delete()
     for files in (ok, img):
@@ -684,12 +677,12 @@ async def holastark2(event):
     d1.text((1433, 1345), text, font=myFont, fill=(51, 51, 51))
     TZ = pytz.timezone(Config.TZ)
     datetime_tz = datetime.now(TZ)
-    oof = datetime_tz.strftime(f"%Y/%m/%d")
+    oof = datetime_tz.strftime("%Y/%m/%d")
     d1.text((961, 2185), oof, font=myFont2, fill=(51, 51, 51))
     d1.text((2441, 2113), random.choice(famous_people), font=myFont3, fill=(51, 51, 51))
     file_name = "certificate.png"
     await event.delete()
-    ok = sedpath + "/" + file_name
+    ok = f"{sedpath}/{file_name}"
     img.save(ok, "PNG")
     await borg.send_file(event.chat_id, ok)
     if os.path.exists(ok):
@@ -739,7 +732,7 @@ async def yufytf(event):
     draw.text(((image_widthz-w)/2, (image_heightz-h)/2), text, font=font, fill=(255, 255, 0))
     file_name = "LogoBy@MeisNub.png"
     await event.delete()
-    ok = sedpath + "/" + file_name
+    ok = f"{sedpath}/{file_name}"
     img.save(ok, "PNG")
     await borg.send_file(event.chat_id, ok, caption="Made By @FridayOT")
     if os.path.exists(ok):
@@ -776,7 +769,7 @@ async def holastark(event):
             10,
         )
     file_name = "CertificateGenBy@FridayOt.png"
-    ok = sedpath + "/" + file_name
+    ok = f"{sedpath}/{file_name}"
     cv2.imwrite(ok, img)
     await event.delete()
     await borg.send_file(event.chat_id, file=ok, caption="Powered By @FridayOT")
@@ -795,31 +788,31 @@ async def warnerstark_s(event):
     if ws == "flip":
         flipped = cv2.flip(image, 0)
         file_name = "Flipped.webp"
-        ok = sedpath + "/" + file_name
+        ok = f"{sedpath}/{file_name}"
         cv2.imwrite(ok, flipped)
         warnerstark = "Hehe, Flipped"
     elif ws == "blur":
         blurred = cv2.blur(image, (8,8))
         file_name = "Blurred.webp"
-        ok = sedpath + "/" + file_name
+        ok = f"{sedpath}/{file_name}"
         cv2.imwrite(ok, blurred)
         warnerstark = "Hehe, Blurred"
     elif ws == "tresh":
         treshold, fridaydevs = cv2.threshold(image, 150, 225, cv2.THRESH_BINARY)
         file_name = "Tresh.webp"
-        ok = sedpath + "/" + file_name
+        ok = f"{sedpath}/{file_name}"
         cv2.imwrite(ok, fridaydevs)
         warnerstark = "Hehe, TreshHolded."
     elif ws == "hsv":
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         file_name = "Hsv.webp"
-        ok = sedpath + "/" + file_name
+        ok = f"{sedpath}/{file_name}"
         cv2.imwrite(ok, hsv)
         warnerstark = "Hehe, Hsv"
     elif ws == "lab":
         lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
         file_name = "Lab.webp"
-        ok = sedpath + "/" + file_name
+        ok = f"{sedpath}/{file_name}"
         cv2.imwrite(ok, lab)
         warnerstark = "Hehe, Lab"
     elif ws == "sketch":
@@ -837,7 +830,7 @@ async def warnerstark_s(event):
         gauss = cv2.GaussianBlur(inv, ksize=(15, 15), sigmaX=0, sigmaY=0)
         pencil_image = dodgeV2(gray, gauss)
         file_name = "Drawn.webp"
-        ok = sedpath + "/" + file_name
+        ok = f"{sedpath}/{file_name}"
         cv2.imwrite(ok, pencil_image)
         warnerstark = "Hehe, Drawn By @FridayOT"
     await event.delete()
@@ -1044,7 +1037,7 @@ async def audio_extract(event):
         thumb = await event.client.download_media(kk.media, thumb=-1)
     except:
         thumb = "./resources/IMG_20200929_103719_628.jpg"
-    name_out = str(os.path.basename(hmm)).split(".")[0] + str(".mp3")
+    name_out = str(os.path.basename(hmm)).split(".")[0] + ".mp3"
     c_time = time.time()
     cmd = f"ffmpeg -i {hmm} -map 0:a {name_out}"
     await runcmd(cmd)
@@ -1081,7 +1074,7 @@ async def convert_to_note(event):
         return
     await event.edit("Ah, Shit. Here it Starts.")
     kk = await event.get_reply_message()
-    if not (kk.video or kk.video_note or kk.gif or kk.video_note):
+    if not kk.video and not kk.video_note and not kk.gif:
         await event.edit("`Oho, Reply To Video Only.`")
         return
     hmm = await event.client.download_media(kk.media)
@@ -1123,7 +1116,7 @@ async def starkmeme(event):
     if event.fwd_from:
         return
     hmm = event.pattern_match.group(1)
-    if hmm == None:
+    if hmm is None:
         await event.edit("Give Some Text")
         return
     if not event.reply_to_msg_id:
@@ -1132,27 +1125,22 @@ async def starkmeme(event):
     mryeast = await event.edit("Making Memes Until Praise MrBeast.")
     await event.get_reply_message()
     seds = await convert_to_image(event, borg)
+    imgpath = f"{sedpath}/memeimg.webp"
     if ";" in hmm:
         stark = hmm.split(";", 1)
         first_txt = stark[0]
         second_txt = stark[1]
         top_text = first_txt
         bottom_text = second_txt
-        generate_meme(seds, top_text=top_text, bottom_text=bottom_text)
-        imgpath = sedpath + "/" + "memeimg.webp"
-        await borg.send_file(event.chat_id, imgpath)
-        if os.path.exists(imgpath):
-            os.remove(imgpath)
-        await mryeast.delete()
     else:
         top_text = hmm
         bottom_text = ""
-        generate_meme(seds, top_text=top_text, bottom_text=bottom_text)
-        imgpath = sedpath + "/" + "memeimg.webp"
-        await borg.send_file(event.chat_id, imgpath)
-        if os.path.exists(imgpath):
-            os.remove(imgpath)
-        await mryeast.delete()
+
+    generate_meme(seds, top_text=top_text, bottom_text=bottom_text)
+    await borg.send_file(event.chat_id, imgpath)
+    if os.path.exists(imgpath):
+        os.remove(imgpath)
+    await mryeast.delete()
 
 
 def generate_meme(
@@ -1190,7 +1178,7 @@ def generate_meme(
         draw.text((x, y), line, fill="white", font=font)
         y += line_height
     file_name = "memeimg.webp"
-    ok = sedpath + "/" + file_name
+    ok = f"{sedpath}/{file_name}"
     im.save(ok, "WebP")
     
 @friday.on(friday_on_cmd(pattern=r"glitch"))
@@ -1204,7 +1192,7 @@ async def glitch(event):
     sed = await event.get_reply_message()
     okbruh = await event.edit("`Gli, Glitchiiingggg.....`")
     photolove = await convert_to_image(event, friday)
-    pathsn = f"./starkgangz/@fridayot.gif"
+    pathsn = "./starkgangz/@fridayot.gif"
     await event.edit("Glitching Image :/")
     glitch_imgs = glitcher.glitch_image(photolove, 2, gif=True, color_offset=True)
     glitch_imgs[0].save(

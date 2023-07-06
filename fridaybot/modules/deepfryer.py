@@ -63,7 +63,7 @@ async def deepfryer(event):
         image = await deepfry(image)
     image.save("./starkgangz/fried.png")
     file_name = "fried.png"
-    ok = "./starkgangz/" + file_name
+    ok = f"./starkgangz/{file_name}"
     await event.reply(file=ok)
     os.remove(ok)
     
@@ -108,32 +108,25 @@ async def deepfry(img: Image) -> Image:
 
 
 async def check_media(reply_message):
-    if reply_message and reply_message.media:
-        if reply_message.photo:
-            data = reply_message.photo
-        elif reply_message.document:
-            if (
-                DocumentAttributeFilename(file_name="AnimatedSticker.tgs")
-                in reply_message.media.document.attributes
-            ):
-                return False
-            if (
-                reply_message.gif
-                or reply_message.video
-                or reply_message.audio
-                or reply_message.voice
-            ):
-                return False
-            data = reply_message.media.document
-        else:
+    if reply_message and reply_message.media and reply_message.photo:
+        data = reply_message.photo
+    elif reply_message and reply_message.media and reply_message.document:
+        if (
+            DocumentAttributeFilename(file_name="AnimatedSticker.tgs")
+            in reply_message.media.document.attributes
+        ):
             return False
+        if (
+            reply_message.gif
+            or reply_message.video
+            or reply_message.audio
+            or reply_message.voice
+        ):
+            return False
+        data = reply_message.media.document
     else:
         return False
-
-    if not data or data is None:
-        return False
-    else:
-        return data
+    return False if not data or data is None else data
 
 
 CMD_HELP.update(

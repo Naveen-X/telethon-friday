@@ -69,7 +69,7 @@ if 1 == 1:
     client = borg
 
     @friday.on(friday_on_cmd(pattern="chat(.*)"))
-    async def quotecmd(message):  # noqa: C901
+    async def quotecmd(message):    # noqa: C901
         """Quote a message.
         Usage: .quote [template]
         If template is missing, possible templates are fetched."""
@@ -140,9 +140,7 @@ if 1 == 1:
 
         pfp = await client.download_profile_photo(profile_photo_url, bytes)
         if pfp is not None:
-            profile_photo_url = (
-                "data:image/png;base64, " + base64.b64encode(pfp).decode()
-            )
+            profile_photo_url = f"data:image/png;base64, {base64.b64encode(pfp).decode()}"
 
         if user_id is not None:
             username_color = config["username_colors"][user_id % 7]
@@ -179,24 +177,23 @@ if 1 == 1:
             else:
                 raise ValueError("Invalid response from server", resp)
         elif resp["status"] == 404:
-            if resp["message"] == "ERROR_TEMPLATE_NOT_FOUND":
-                newreq = requests.post(
-                    config["api_url"] + "/api/v1/getalltemplates",
-                    data={"token": config["api_token"]},
-                )
-                newreq = newreq.json()
-
-                if newreq["status"] == "NOT_ENOUGH_PERMISSIONS":
-                    return await message.respond(strings["not_enough_permissions"])
-                elif newreq["status"] == "SUCCESS":
-                    templates = strings["delimiter"].join(newreq["message"])
-                    return await message.respond(strings["templates"].format(templates))
-                elif newreq["status"] == "INVALID_TOKEN":
-                    return await message.respond(strings["invalid_token"])
-                else:
-                    raise ValueError("Invalid response from server", newreq)
-            else:
+            if resp["message"] != "ERROR_TEMPLATE_NOT_FOUND":
                 raise ValueError("Invalid response from server", resp)
+            newreq = requests.post(
+                config["api_url"] + "/api/v1/getalltemplates",
+                data={"token": config["api_token"]},
+            )
+            newreq = newreq.json()
+
+            if newreq["status"] == "NOT_ENOUGH_PERMISSIONS":
+                return await message.respond(strings["not_enough_permissions"])
+            elif newreq["status"] == "SUCCESS":
+                templates = strings["delimiter"].join(newreq["message"])
+                return await message.respond(strings["templates"].format(templates))
+            elif newreq["status"] == "INVALID_TOKEN":
+                return await message.respond(strings["invalid_token"])
+            else:
+                raise ValueError("Invalid response from server", newreq)
         elif resp["status"] != 200:
             raise ValueError("Invalid response from server", resp)
 
@@ -252,7 +249,7 @@ def get_markdown(reply):
         elif isinstance(entity, telethon.tl.types.MessageEntityUnderline):
             md_item["Type"] = "underline"
         else:
-            logger.warning("Unknown entity: " + str(entity))
+            logger.warning(f"Unknown entity: {str(entity)}")
 
         markdown.append(md_item)
     return markdown

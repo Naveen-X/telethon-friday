@@ -50,10 +50,7 @@ def get_readable_time(seconds: int) -> str:
 
     while count < 4:
         count += 1
-        if count < 3:
-            remainder, result = divmod(seconds, 60)
-        else:
-            remainder, result = divmod(seconds, 24)
+        remainder, result = divmod(seconds, 60) if count < 3 else divmod(seconds, 24)
         if seconds == 0 and remainder == 0:
             break
         time_list.append(int(result))
@@ -62,7 +59,7 @@ def get_readable_time(seconds: int) -> str:
     for x in range(len(time_list)):
         time_list[x] = str(time_list[x]) + time_suffix_list[x]
     if len(time_list) == 4:
-        ping_time += time_list.pop() + ", "
+        ping_time += f"{time_list.pop()}, "
 
     time_list.reverse()
     ping_time += ":".join(time_list)
@@ -114,8 +111,7 @@ async def fridayalive(alive):
 async def _(event):
     if event.fwd_from:
         return
-    args = event.pattern_match.group(1).lower()
-    if args:
+    if args := event.pattern_match.group(1).lower():
         if args in CMD_HELP:
             await event.edit(f"Here is some help for the {CMD_HELP[args]}")
         else:
@@ -123,9 +119,7 @@ async def _(event):
                 f"Help string for {args} not found! Type `.help` to see valid module names."
             )
     else:
-        string = ""
-        for i in CMD_HELP.values():
-            string += f"`{str(i[0])}`, "
+        string = "".join(f"`{str(i[0])}`, " for i in CMD_HELP.values())
         string = string[:-2]
         await event.edit(
             "Please specify which module you want help for!\n\n" f"{string}"
@@ -139,10 +133,7 @@ async def _(event):
     if event.fwd_from:
         return
     hmm = await bot.get_me()
-    if not hmm.username:
-        rip = hmm.id
-    else:
-        rip = f"@{hmm.username}"
+    rip = hmm.id if not hmm.username else f"@{hmm.username}"
     bothmm = await tgbot.get_me()
     uptime = get_readable_time((time.time() - Lastupdate))
     end = datetime.now()
@@ -168,9 +159,7 @@ async def install(event):
                 shortname = path1.stem
                 load_module(shortname.replace(".py", ""))
                 await event.edit(
-                    "Friday Has Installed `{}` Sucessfully.".format(
-                        os.path.basename(downloaded_file_name)
-                    )
+                    f"Friday Has Installed `{os.path.basename(downloaded_file_name)}` Sucessfully."
                 )
             else:
                 os.remove(downloaded_file_name)
@@ -223,9 +212,8 @@ async def print_changelogs(event, ac_br, changelog):
     changelog_str = f"**Updates available in {ac_br} branch!**\n\n{changelog}"
     if len(changelog_str) > 4096:
         await event.edit("**Changelog is too big, sending as a file.**")
-        file = open("output.txt", "w+")
-        file.write(changelog_str)
-        file.close()
+        with open("output.txt", "w+") as file:
+            file.write(changelog_str)
         await event.client.send_file(event.chat_id, "output.txt")
         remove("output.txt")
     else:
@@ -275,7 +263,7 @@ async def deploy(event, repo, ups_rem, ac_br, txt):
         ups_rem.fetch(ac_br)
         repo.git.reset("--hard", "FETCH_HEAD")
         heroku_git_url = heroku_app.git_url.replace(
-            "https://", "https://api:" + HEROKU_API_KEY + "@"
+            "https://", f"https://api:{HEROKU_API_KEY}@"
         )
         if "heroku" in repo.remotes:
             remote = repo.remote("heroku")
@@ -326,8 +314,10 @@ async def upstream(event):
     off_repo = UPSTREAM_REPO_URL
     force_update = False
     try:
-        txt = "**Oops.. Updater cannot continue due to "
-        txt += "some problems**\n`LOGTRACE:`\n"
+        txt = (
+            "**Oops.. Updater cannot continue due to "
+            + "some problems**\n`LOGTRACE:`\n"
+        )
         repo = Repo()
     except NoSuchPathError as error:
         await event.edit(f"{txt}\n**Directory** `{error}` **was not found.**")
@@ -381,7 +371,7 @@ async def upstream(event):
         )
         return repo.__del__()
 
-    if conf == "" and force_update is False:
+    if conf == "" and not force_update:
         await print_changelogs(event, ac_br, changelog)
         await event.delete()
         return await event.respond(
@@ -409,9 +399,9 @@ async def cmd_list(event):
         if tgbotusername is None or input_str == "text":
             string = ""
             for i in CMD_LIST:
-                string += "ℹ️ " + i + "\n"
+                string += f"ℹ️ {i}" + "\n"
                 for iter_list in CMD_LIST[i]:
-                    string += "    `" + str(iter_list) + "`"
+                    string += f"    `{str(iter_list)}`"
                     string += "\n"
                 string += "\n"
             if len(string) > 4095:
@@ -421,13 +411,13 @@ async def cmd_list(event):
                 await event.edit(string)
         elif input_str:
             if input_str in CMD_LIST:
-                string = "Commands found in {}:\n".format(input_str)
+                string = f"Commands found in {input_str}:\n"
                 for i in CMD_LIST[input_str]:
-                    string += "    " + i
+                    string += f"    {i}"
                     string += "\n"
                 await event.edit(string)
             else:
-                await event.edit(input_str + " is not a valid plugin!")
+                await event.edit(f"{input_str} is not a valid plugin!")
         else:
             help_string = """Friday Userbot Modules Are Listed Here !\n
 For More Help or Support Visit @FridayOT"""

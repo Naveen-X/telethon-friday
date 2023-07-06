@@ -67,12 +67,10 @@ async def _(event):
     search = AnimeSearch(input_str)
     ID = search.results[0].mal_id
     anime = Anime(ID)
-    jp = ""
-    for x in anime.genres:
-      jp += x + ";  "
+    jp = "".join(f"{x};  " for x in anime.genres)
     link = anime.image_url
-    if link == None:
-      link = search.results[0].image_url
+    if link is None:
+        link = search.results[0].image_url
     By = f"""<u><b>Anime Information Gathered</b></u>
 <b>tlele:- {search.results[0].title}
 Mal ID:- {search.results[0].mal_id}
@@ -109,12 +107,10 @@ async def _(event):
     search = MangaSearch(input_str)
     ID = search.results[0].mal_id
     manga = Manga(ID)
-    jp = ""
-    for x in manga.genres:
-      jp += x + ";  "
+    jp = "".join(f"{x};  " for x in manga.genres)
     link = manga.image_url
-    if link == None:
-      link = search.results[0].image_url
+    if link is None:
+        link = search.results[0].image_url
     By = f"""<u><b>manga Information Gathered</b></u>
 <b>tlele:- {search.results[0].title}
 Mal ID:- {search.results[0].mal_id}

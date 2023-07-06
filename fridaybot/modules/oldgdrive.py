@@ -21,7 +21,7 @@ from telethon import events
 from uniborg.util import friday_on_cmd
 
 # Path to token json file, it should be in same directory as script
-G_DRIVE_TOKEN_FILE = Config.TEMP_DOWNLOAD_DIRECTORY + "/auth_token.txt"
+G_DRIVE_TOKEN_FILE = f"{Config.TEMP_DOWNLOAD_DIRECTORY}/auth_token.txt"
 # Copy your credentials from the APIs Console
 CLIENT_ID = Config.G_DRIVE_CLIENT_ID
 CLIENT_SECRET = Config.G_DRIVE_CLIENT_SECRET
@@ -64,16 +64,14 @@ async def _(event):
             end = datetime.now()
             ms = (end - start).seconds
             required_file_name = downloaded_file_name
-            await mone.edit(
-                "Downloaded to `{}` in {} seconds.".format(downloaded_file_name, ms)
-            )
+            await mone.edit(f"Downloaded to `{required_file_name}` in {ms} seconds.")
     elif input_str:
         input_str = input_str.strip()
         if os.path.exists(input_str):
             end = datetime.now()
             ms = (end - start).seconds
             required_file_name = input_str
-            await mone.edit("Found `{}` in {} seconds.".format(input_str, ms))
+            await mone.edit(f"Found `{required_file_name}` in {ms} seconds.")
         else:
             await mone.edit("File Not found in local server. Give me a file path :((")
             return False
@@ -105,9 +103,7 @@ async def _(event):
                 http, required_file_name, file_name, mime_type, mone, parent_id
             )
             await mone.edit(
-                "__Successfully Uploaded File on G-Drive :__\n[{}]({})".format(
-                    file_name, g_drive_link
-                )
+                f"__Successfully Uploaded File on G-Drive :__\n[{file_name}]({g_drive_link})"
             )
         except Exception as e:
             await mone.edit(f"Exception occurred while uploading to gDrive {e}")
@@ -142,14 +138,12 @@ async def sch(event):
         # Authorize, get file parameters, upload file and print out result URL for download
     http = authorize(G_DRIVE_TOKEN_FILE, None)
     input_str = event.pattern_match.group(1).strip()
-    await event.edit("Searching for {} in G-Drive.".format(input_str))
+    await event.edit(f"Searching for {input_str} in G-Drive.")
     if parent_id is not None:
-        query = "'{}' in parents and (title contains '{}')".format(parent_id, input_str)
+        query = f"'{parent_id}' in parents and (title contains '{input_str}')"
     else:
-        query = "title contains '{}'".format(input_str)
-    query = "'{}' in parents and (title contains '{}')".format(
-        parent_id, input_str
-    )  # search_query(parent_id,input_str)
+        query = f"title contains '{input_str}'"
+    query = f"'{parent_id}' in parents and (title contains '{input_str}')"
     msg = await gsearch(http, query, input_str)
     await event.edit(str(msg))
 
@@ -172,17 +166,12 @@ async def gsearch(http, query, filename):
         for file in response.get("items", []):
             if file.get("mimeType") == "application/vnd.google-apps.folder":
                 msg += (
-                    "⁍ [{}](https://drive.google.com/drive/folders/{}) (folder)".format(
-                        file.get("title"), file.get("id")
-                    )
+                    f'⁍ [{file.get("title")}](https://drive.google.com/drive/folders/{file.get("id")}) (folder)'
                     + "\n"
                 )
-            # Process change
             else:
                 msg += (
-                    "⁍ [{}](https://drive.google.com/uc?id={}&export=download)".format(
-                        file.get("title"), file.get("id")
-                    )
+                    f'⁍ [{file.get("title")}](https://drive.google.com/uc?id={file.get("id")}&export=download)'
                     + "\n"
                 )
         page_token = response.get("nextPageToken", None)
@@ -228,12 +217,12 @@ async def _(event):
         )
         # Authorize, get file parameters, upload file and print out result URL for download
         # first, create a sub-directory
-        await event.edit("Uploading `{}` to G-Drive...".format(input_str))
+        await event.edit(f"Uploading `{input_str}` to G-Drive...")
         dir_id = await create_directory(
             http, os.path.basename(os.path.abspath(input_str)), parent_id
         )
         await DoTeskWithDir(http, input_str, event, dir_id)
-        dir_link = "https://drive.google.com/folderview?id={}".format(dir_id)
+        dir_link = f"https://drive.google.com/folderview?id={dir_id}"
         await event.edit(
             f"__Successfully Uploaded Folder To G-Drive...__\n[{input_str}]({dir_link})"
         )
@@ -251,7 +240,7 @@ async def create_directory(http, directory_name, parent_id):
     file_id = file.get("id")
     drive_service.permissions().insert(fileId=file_id, body=permissions).execute()
     logger.info(
-        "Created Gdrive Folder:\nName: {}\nID: {} ".format(file.get("title"), file_id)
+        f'Created Gdrive Folder:\nName: {file.get("title")}\nID: {file_id} '
     )
     return file_id
 
@@ -348,8 +337,8 @@ async def upload_file(http, file_path, file_name, mime_type, event, parent_id):
         if status:
             percentage = int(status.progress() * 100)
             progress_str = "[{0}{1}]\nProgress: {2}%\n".format(
-                "".join(["█" for i in range(math.floor(percentage / 5))]),
-                "".join(["░" for i in range(20 - math.floor(percentage / 5))]),
+                "".join(["█" for _ in range(math.floor(percentage / 5))]),
+                "".join(["░" for _ in range(20 - math.floor(percentage / 5))]),
                 round(percentage, 2),
             )
             current_message = (
@@ -366,8 +355,7 @@ async def upload_file(http, file_path, file_name, mime_type, event, parent_id):
     drive_service.permissions().insert(fileId=file_id, body=permissions).execute()
     # Define file instance and get url for download
     file = drive_service.files().get(fileId=file_id).execute()
-    download_url = file.get("webContentLink")
-    return download_url
+    return file.get("webContentLink")
 
 
 # @command(pattern="^.gfolder ?(.*)")
@@ -375,5 +363,5 @@ async def upload_file(http, file_path, file_name, mime_type, event, parent_id):
 async def _(event):
     if event.fwd_from:
         return
-    folder_link = "https://drive.google.com/folderview?id=" + parent_id
+    folder_link = f"https://drive.google.com/folderview?id={parent_id}"
     await event.edit("`Here is Your G-Drive Folder link : `\n" + folder_link)

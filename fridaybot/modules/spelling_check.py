@@ -24,8 +24,6 @@ async def _(event):
     if Config.AUTO_SPELL_FIX != True:
         return
     input_str = event.pattern_match.group(1)
-    if input_str.startwith(".", "!", "'", "/", ":", "*"):
-        pass
-    else:
+    if not input_str.startwith(".", "!", "'", "/", ":", "*"):
         bm = TextBlob(input_str)
         await event.edit(bm)

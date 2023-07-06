@@ -57,7 +57,7 @@ async def oki(event):
             f"**User :** `{user}` \n**Reason :** `{extra} {json_codes[extra]}` \n**Banned Sucessfully !**"
         )
     except Exception as e:
-        await event.edit("**Errors : **" + str(e))
+        await event.edit(f"**Errors : **{str(e)}")
 
 
 @borg.on(admin_cmd(pattern="nspuban(?: |$)(.*)"))
@@ -88,7 +88,7 @@ async def oka(event):
         await borg.send_message("nospamplusfed", f"/unfban {user}")
         await event.edit(f"**User :** `{user}` \n**UnBanned Sucessfully !**")
     except Exception as e:
-        await event.edit("**Errors : **" + str(e))
+        await event.edit(f"**Errors : **{str(e)}")
 
 @borg.on(admin_cmd(pattern="generatetoken"))
 async def tokens(event):
@@ -100,4 +100,4 @@ async def tokens(event):
         skynet = sclient.new_token(okbabe)
         await event.edit(f"**New Token** \n**Token** : `{okbabe}`")
     except Exception as e:
-        await event.edit("**Errors : **" + str(e))
+        await event.edit(f"**Errors : **{str(e)}")

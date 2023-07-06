@@ -31,20 +31,17 @@ async def _(event):
     usermail = ujwal[0]
     passwd = ujwal[1]
     webo = ujwal[2]
-    if os.path.exists("./chsaiujwal/info.pablo"):
-        file = open("./chsaiujwal/info.pablo", "a")
-    else:
+    if not os.path.exists("./chsaiujwal/info.pablo"):
         file = open("./chsaiujwal/info.pablo", "x")
         file.close()
-        file = open("./chsaiujwal/info.pablo", "a")
-
+    file = open("./chsaiujwal/info.pablo", "a")
     userName = usermail
     password = passwd
     website = webo
 
-    usrnm = "UserName: " + userName + "\n"
-    pwd = "Password: " + password + "\n"
-    web = "Website: " + website + "\n"
+    usrnm = f"UserName: {userName}" + "\n"
+    pwd = f"Password: {password}" + "\n"
+    web = f"Website: {website}" + "\n"
 
     file.write("---------------------------------\n")
     file.write(usrnm)
@@ -54,8 +51,7 @@ async def _(event):
     file.write("\n")
     file.close
     await event.edit(
-        f"<b><u>Password Saved Successfully</b></u>",
-        parse_mode="HTML",
+        "<b><u>Password Saved Successfully</b></u>", parse_mode="HTML"
     )
 
 
@@ -63,9 +59,8 @@ async def _(event):
 async def hi(event):
     if event.fwd_from:
         return
-    file = open("./chsaiujwal/info.pablo", "r")
-    content = file.read()
-    file.close()
+    with open("./chsaiujwal/info.pablo", "r") as file:
+        content = file.read()
     await event.edit(
         f"<b><u>Here are your Saved Passwords</u></b>\n<code>{content}</code>",
         parse_mode="HTML",

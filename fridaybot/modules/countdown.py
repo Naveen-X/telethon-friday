@@ -16,11 +16,10 @@ async def timer_blankx(e):
 
     k = j
 
-    for j in range(j):
-
+    for _ in range(k):
         await e.edit(txt + str(k))
 
-        k = k - 50
+        k -= 50
 
         await asyncio.sleep(50)
 
@@ -30,7 +29,7 @@ async def timer_blankx(e):
 
     else:
 
-        await e.edit(txt + "NaN")
+        await e.edit(f"{txt}NaN")
 
 
 @friday.on(friday_on_cmd(pattern="(f?s)cd "))
@@ -43,11 +42,10 @@ async def timer_blankx(e):
 
     k = j
 
-    for j in range(j):
-
+    for _ in range(k):
         await e.edit(txt + str(k))
 
-        k = k - 1
+        k -= 1
 
         await asyncio.sleep(1)
 
@@ -57,7 +55,7 @@ async def timer_blankx(e):
 
     else:
 
-        await e.edit(txt + "NaN")
+        await e.edit(f"{txt}NaN")
 
 
 @friday.on(admin_cmd(pattern="(f?p)an"))
@@ -70,11 +68,10 @@ async def timer_blankx(e):
 
     k = j
 
-    for j in range(j):
-
+    for _ in range(k):
         await e.edit(txt + str(k))
 
-        k = k - 1
+        k -= 1
 
         await asyncio.sleep(1)
 

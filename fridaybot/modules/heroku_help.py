@@ -47,7 +47,7 @@ async def dyno_usage(dyno):
         "Authorization": f"Bearer {Config.HEROKU_API_KEY}",
         "Accept": "application/vnd.heroku+json; version=3.account-quotas",
     }
-    path = "/accounts/" + user_id + "/actions/get-quota"
+    path = f"/accounts/{user_id}/actions/get-quota"
     r = requests.get(heroku_api + path, headers=headers)
     if r.status_code != 200:
         return await edit_or_reply(
@@ -181,11 +181,10 @@ async def variable(var):
                 var, "`Please specify ConfigConfigs you want to delete`"
             )
         await asyncio.sleep(1.5)
-        if variable in heroku_var:
-            await edit_or_reply(var, f"**{variable}**  `successfully deleted`")
-            del heroku_var[variable]
-        else:
+        if variable not in heroku_var:
             return await edit_or_reply(var, f"**{variable}**  `is not exists`")
+        await edit_or_reply(var, f"**{variable}**  `successfully deleted`")
+        del heroku_var[variable]
 
 
 @friday.on(friday_on_cmd(pattern="shp ?(.*)"))

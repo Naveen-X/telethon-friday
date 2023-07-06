@@ -35,7 +35,7 @@ async def gps(event):
     if not address:
         return await starkislub.edit("`Give Input Location.`")
     await starkislub.edit("`Searching..`")
-    url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(address) +'?format=json'
+    url = f'https://nominatim.openstreetmap.org/search/{urllib.parse.quote(address)}?format=json'
     response = requests.get(url).json()
     try:
         lat = response[0]["lat"]

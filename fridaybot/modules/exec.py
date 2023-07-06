@@ -37,7 +37,7 @@ async def _(event):
     else:
         evaluation = "Success"
 
-    final_output = "**EXEC**: `{}` \n\n **OUTPUT**: \n`{}` \n".format(cmd, evaluation)
+    final_output = f"**EXEC**: `{cmd}` \n\n **OUTPUT**: \n`{evaluation}` \n"
 
     if len(final_output) > 4096:
         with io.BytesIO(str.encode(final_output)) as out_file:
@@ -56,7 +56,10 @@ async def _(event):
 
 
 async def aexec(code, event):
-    exec(f"async def __aexec(event): " + "".join(f"\n {l}" for l in code.split("\n")))
+    exec(
+        "async def __aexec(event): "
+        + "".join(f"\n {l}" for l in code.split("\n"))
+    )
     return await locals()["__aexec"](event)
 
 

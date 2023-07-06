@@ -64,7 +64,7 @@ async def get_weather(weather):
     if "," in CITY:
         newcity = CITY.split(",")
         if len(newcity[1]) == 2:
-            CITY = newcity[0].strip() + "," + newcity[1].strip()
+            CITY = f"{newcity[0].strip()},{newcity[1].strip()}"
         else:
             country = await get_tz((newcity[1].strip()).title())
             try:
@@ -72,14 +72,14 @@ async def get_weather(weather):
             except KeyError:
                 await weather.edit("`Invalid country.`")
                 return
-            CITY = newcity[0].strip() + "," + countrycode.strip()
+            CITY = f"{newcity[0].strip()},{countrycode.strip()}"
 
     url = f"https://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={APPID}"
     request = requests.get(url)
     result = json.loads(request.text)
 
     if request.status_code != 200:
-        await weather.edit(f"`Invalid country.`")
+        await weather.edit("`Invalid country.`")
         return
 
     cityname = result["name"]
@@ -167,7 +167,7 @@ async def set_default_city(city):
     if "," in CITY:
         newcity = CITY.split(",")
         if len(newcity[1]) == 2:
-            CITY = newcity[0].strip() + "," + newcity[1].strip()
+            CITY = f"{newcity[0].strip()},{newcity[1].strip()}"
         else:
             country = await get_tz((newcity[1].strip()).title())
             try:
@@ -175,14 +175,14 @@ async def set_default_city(city):
             except KeyError:
                 await city.edit("`Invalid country.`")
                 return
-            CITY = newcity[0].strip() + "," + countrycode.strip()
+            CITY = f"{newcity[0].strip()},{countrycode.strip()}"
 
     url = f"https://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={APPID}"
     request = requests.get(url)
     result = json.loads(request.text)
 
     if request.status_code != 200:
-        await city.edit(f"`Invalid country.`")
+        await city.edit("`Invalid country.`")
         return
 
     DEFCITY = CITY

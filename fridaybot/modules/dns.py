@@ -17,12 +17,11 @@ async def _(event):
     if event.fwd_from:
         return
     input_str = event.pattern_match.group(1)
-    sample_url = "https://da.gd/dns/{}".format(input_str)
-    response_api = requests.get(sample_url).text
-    if response_api:
-        await starky.edit("DNS records of {} are \n{}".format(input_str, response_api))
+    sample_url = f"https://da.gd/dns/{input_str}"
+    if response_api := requests.get(sample_url).text:
+        await starky.edit(f"DNS records of {input_str} are \n{response_api}")
     else:
-        await starky.edit("i can't seem to find {} on the internet".format(input_str))
+        await starky.edit(f"i can't seem to find {input_str} on the internet")
 
 
 @friday.on(friday_on_cmd("url (.*)"))
@@ -32,10 +31,9 @@ async def _(event):
     if event.fwd_from:
         return
     input_str = event.pattern_match.group(1)
-    sample_url = "https://da.gd/s?url={}".format(input_str)
-    response_api = requests.get(sample_url).text
-    if response_api:
-        await starkxd.edit("Generated {} for {}.".format(response_api, input_str))
+    sample_url = f"https://da.gd/s?url={input_str}"
+    if response_api := requests.get(sample_url).text:
+        await starkxd.edit(f"Generated {response_api} for {input_str}.")
     else:
         await starkxd.edit("something is wrong. please try again later.")
 
@@ -47,15 +45,15 @@ async def _(event):
         return
     input_str = event.pattern_match.group(1)
     if not input_str.startswith("http"):
-        input_str = "http://" + input_str
+        input_str = f"http://{input_str}"
     r = requests.get(input_str, allow_redirects=False)
     if str(r.status_code).startswith("3"):
         await sadness.edit(
-            "Input URL: {}\nReDirected URL: {}".format(input_str, r.headers["Location"])
+            f'Input URL: {input_str}\nReDirected URL: {r.headers["Location"]}'
         )
     else:
         await sadness.edit(
-            "Input URL {} returned status_code {}".format(input_str, r.status_code)
+            f"Input URL {input_str} returned status_code {r.status_code}"
         )
 
 

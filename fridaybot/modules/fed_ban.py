@@ -32,7 +32,7 @@ async def _(event):
     yeslol = 0
     await event.edit("`Processing..`")
     lol_s = event.pattern_match.group(1)
-    if lol_s == None:
+    if lol_s is None:
         await event.edit("`Give FeD ID`")
         return
     elif lol_s == " ":
@@ -62,7 +62,7 @@ async def _(event):
     lol_s = event.pattern_match.group(1)
     await event.edit("`Processing..`")
     lol = get_all_feds()
-    if lol_s == None:
+    if lol_s is None:
         await event.edit("`Give FeD ID`")
         return
     elif lol_s == " ":
@@ -84,7 +84,7 @@ async def _(event):
     if event.fwd_from:
         return
     lol_s = event.text.split(" ", maxsplit=1)[1]
-    if lol_s == None:
+    if lol_s is None:
         await event.edit("`No user Found To Fban.`")
         return
     all_fed = get_all_feds()
@@ -100,13 +100,13 @@ async def _(event):
     try:
         await borg.send_message(chnnl_grp, "/start")
     except Exception as e:
-        await event.edit("**Errors** : " + str(e))
+        await event.edit(f"**Errors** : {str(e)}")
         return
     for teamz in all_fed:
         try:
-            await borg.send_message(chnnl_grp, "/joinfed " + teamz.feds)
+            await borg.send_message(chnnl_grp, f"/joinfed {teamz.feds}")
             await asyncio.sleep(2)
-            await borg.send_message(chnnl_grp, "/fban " + lol_s)
+            await borg.send_message(chnnl_grp, f"/fban {lol_s}")
             await asyncio.sleep(5)
         except:
             errors += 1
@@ -120,7 +120,7 @@ async def _(event):
     if event.fwd_from:
         return
     lol_s = event.pattern_match.group(1)
-    if lol_s == None:
+    if lol_s is None:
         await event.edit("`No User Found To Fban.`")
         return
     all_fed = get_all_feds()
@@ -133,13 +133,13 @@ async def _(event):
     try:
         await borg.send_message(chnnl_grp, "/start")
     except Exception as e:
-        await event.edit("**Errors** : " + str(e))
+        await event.edit(f"**Errors** : {str(e)}")
         return
     for teamz in all_fed:
         try:
-            await borg.send_message(chnnl_grp, "/joinfed " + teamz.feds)
+            await borg.send_message(chnnl_grp, f"/joinfed {teamz.feds}")
             await asyncio.sleep(2)
-            await borg.send_message(chnnl_grp, "/unfban " + lol_s)
+            await borg.send_message(chnnl_grp, f"/unfban {lol_s}")
             await asyncio.sleep(5)
         except:
             errors += 1

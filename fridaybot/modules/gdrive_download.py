@@ -23,16 +23,18 @@ async def download_file_from_google_drive(id):
     content = headers["Content-Disposition"]
     destination = await get_file_name(content)
 
-    file_name = await save_response_content(response, destination)
-    return file_name
+    return await save_response_content(response, destination)
 
 
 async def get_confirm_token(response):
-    for key, value in response.cookies.items():
-        if key.startswith("download_warning"):
-            return value
-
-    return None
+    return next(
+        (
+            value
+            for key, value in response.cookies.items()
+            if key.startswith("download_warning")
+        ),
+        None,
+    )
 
 
 async def save_response_content(response, destination):
@@ -70,14 +72,14 @@ async def get_file_name(content):
     file_name = ""
     c_append = False
     for c in str(content):
-        if c == '"':
-            c_append = True
         if c == ";":
             c_append = False
+        elif c == '"':
+            c_append = True
         if c_append:
             file_name = file_name + c
     file_name = file_name.replace('"', "")
-    print("File Name: " + str(file_name))
+    print(f"File Name: {str(file_name)}")
     return file_name
 
 
@@ -86,7 +88,7 @@ async def g_download(event):
     if event.fwd_from:
         return
     drive_link = event.text[4:]
-    print("Drive Link: " + drive_link)
+    print(f"Drive Link: {drive_link}")
     file_id = await get_id(drive_link)
     await event.edit("Downloading Requested File from G-Drive...")
     file_name = await download_file_from_google_drive(file_id)

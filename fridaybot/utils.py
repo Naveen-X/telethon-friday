@@ -29,66 +29,64 @@ def command(**args):
     file_test = file_test.stem.replace(".py", "")
     if 1 == 0:
         return print("stupidity at its best")
-    else:
-        pattern = args.get("pattern", None)
-        allow_sudo = args.get("allow_sudo", False)
-        allow_edited_updates = args.get("allow_edited_updates", False)
-        args["incoming"] = args.get("incoming", False)
-        args["outgoing"] = True
-        if bool(args["incoming"]):
-            args["outgoing"] = False
+    pattern = args.get("pattern", None)
+    allow_sudo = args.get("allow_sudo", False)
+    allow_edited_updates = args.get("allow_edited_updates", False)
+    args["incoming"] = args.get("incoming", False)
+    args["outgoing"] = True
+    if bool(args["incoming"]):
+        args["outgoing"] = False
 
+    try:
+        if pattern is not None and not pattern.startswith("(?i)"):
+            args["pattern"] = f"(?i){pattern}"
+    except:
+        pass
+
+    reg = re.compile("(.*)")
+    if pattern is not None:
         try:
-            if pattern is not None and not pattern.startswith("(?i)"):
-                args["pattern"] = "(?i)" + pattern
-        except:
-            pass
-
-        reg = re.compile("(.*)")
-        if not pattern == None:
+            cmd = re.search(reg, pattern)
             try:
-                cmd = re.search(reg, pattern)
-                try:
-                    cmd = (
-                        cmd.group(1).replace("$", "").replace("\\", "").replace("^", "")
-                    )
-                except:
-                    pass
-
-                try:
-                    CMD_LIST[file_test].append(cmd)
-                except:
-                    CMD_LIST.update({file_test: [cmd]})
+                cmd = cmd[1].replace("$", "").replace("\\", "").replace("^", "")
             except:
                 pass
 
-        if allow_sudo:
-            args["from_users"] = list(Config.SUDO_USERS)
-            # Mutually exclusive with outgoing (can only set one of either).
-            args["incoming"] = True
-        del allow_sudo
-        try:
-            del args["allow_sudo"]
+            try:
+                CMD_LIST[file_test].append(cmd)
+            except:
+                CMD_LIST.update({file_test: [cmd]})
         except:
             pass
 
-        if "allow_edited_updates" in args:
-            del args["allow_edited_updates"]
+    if allow_sudo:
+        args["from_users"] = list(Config.SUDO_USERS)
+        # Mutually exclusive with outgoing (can only set one of either).
+        args["incoming"] = True
+    del allow_sudo
+    try:
+        del args["allow_sudo"]
+    except:
+        pass
 
-        def decorator(func):
-            if not allow_edited_updates:
-                bot.add_event_handler(func, events.MessageEdited(**args))
-            bot.add_event_handler(func, events.NewMessage(**args))
-            if client2:
-                client2.add_event_handler(func, events.NewMessage(**args))
-            if client3:
-                client3.add_event_handler(func, events.NewMessage(**args))
-            try:
-                LOAD_PLUG[file_test].append(func)
-            except Exception:
-                LOAD_PLUG.update({file_test: [func]})
-            return func
-        return decorator
+    if "allow_edited_updates" in args:
+        del args["allow_edited_updates"]
+
+    def decorator(func):
+        if not allow_edited_updates:
+            bot.add_event_handler(func, events.MessageEdited(**args))
+        bot.add_event_handler(func, events.NewMessage(**args))
+        if client2:
+            client2.add_event_handler(func, events.NewMessage(**args))
+        if client3:
+            client3.add_event_handler(func, events.NewMessage(**args))
+        try:
+            LOAD_PLUG[file_test].append(func)
+        except Exception:
+            LOAD_PLUG.update({file_test: [func]})
+        return func
+
+    return decorator
 
 
 def load_module(shortname):
@@ -103,11 +101,11 @@ def load_module(shortname):
         import fridaybot.utils
 
         path = Path(f"fridaybot/modules/{shortname}.py")
-        name = "fridaybot.modules.{}".format(shortname)
+        name = f"fridaybot.modules.{shortname}"
         spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        sedprint.info("Successfully (re)imported " + shortname)
+        sedprint.info(f"Successfully (re)imported {shortname}")
     else:
         import importlib
         import sys
@@ -117,7 +115,7 @@ def load_module(shortname):
         import fridaybot.utils
 
         path = Path(f"fridaybot/modules/{shortname}.py")
-        name = "fridaybot.modules.{}".format(shortname)
+        name = f"fridaybot.modules.{shortname}"
         spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(spec)
         mod.bot = bot
@@ -150,8 +148,8 @@ def load_module(shortname):
         sys.modules["fridaybot.function.events"] = fridaybot.utils
         spec.loader.exec_module(mod)
         # for imports
-        sys.modules["fridaybot.modules." + shortname] = mod
-        sedprint.info("Successfully imported " + shortname)
+        sys.modules[f"fridaybot.modules.{shortname}"] = mod
+        sedprint.info(f"Successfully imported {shortname}")
 
 def load_module_dclient(shortname, client):
     if shortname.startswith("__"):
@@ -165,7 +163,7 @@ def load_module_dclient(shortname, client):
         import fridaybot.utils
 
         path = Path(f"fridaybot/modules/{shortname}.py")
-        name = "fridaybot.modules.{}".format(shortname)
+        name = f"fridaybot.modules.{shortname}"
         spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
@@ -178,7 +176,7 @@ def load_module_dclient(shortname, client):
         import fridaybot.utils
 
         path = Path(f"fridaybot/modules/{shortname}.py")
-        name = "fridaybot.modules.{}".format(shortname)
+        name = f"fridaybot.modules.{shortname}"
         spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(spec)
         mod.bot = client
@@ -186,7 +184,7 @@ def load_module_dclient(shortname, client):
         mod.Config = Config
         mod.Var = Config
         mod.command = command
-        sedlu = str(shortname) + "- MClient -"
+        sedlu = f"{str(shortname)}- MClient -"
         mod.logger = logging.getLogger(sedlu)
         # support for uniborg
         sys.modules["uniborg.util"] = fridaybot.utils
@@ -210,7 +208,7 @@ def load_module_dclient(shortname, client):
         sys.modules["fridaybot.events"] = fridaybot.utils
         sys.modules["fridaybot.function.events"] = fridaybot.utils
         spec.loader.exec_module(mod)
-        sys.modules["fridaybot.modules." + shortname] = mod
+        sys.modules[f"fridaybot.modules.{shortname}"] = mod
 
 def remove_plugin(shortname):
     try:
@@ -339,17 +337,17 @@ def register(**args):
     disable_edited = args.get("disable_edited", True)
 
     if pattern is not None and not pattern.startswith("(?i)"):
-        args["pattern"] = "(?i)" + pattern
+        args["pattern"] = f"(?i){pattern}"
 
     if "disable_edited" in args:
         del args["disable_edited"]
 
     reg = re.compile("(.*)")
-    if not pattern == None:
+    if pattern is not None:
         try:
             cmd = re.search(reg, pattern)
             try:
-                cmd = cmd.group(1).replace("$", "").replace("\\", "").replace("^", "")
+                cmd = cmd[1].replace("$", "").replace("\\", "").replace("^", "")
             except:
                 pass
 
@@ -373,6 +371,7 @@ def register(**args):
         except Exception:
             LOAD_PLUG.update({file_test: [func]})
         return func
+
     return decorator
 
 
@@ -437,19 +436,17 @@ async def progress(current, total, event, start, type_of_ps, file_name=None):
         time_to_completion = round((total - current) / speed) * 1000
         estimated_total_time = elapsed_time + time_to_completion
         progress_str = "[{0}{1}]\nProgress: {2}%\n".format(
-            "".join(["█" for i in range(math.floor(percentage / 5))]),
-            "".join(["░" for i in range(20 - math.floor(percentage / 5))]),
+            "".join(["█" for _ in range(math.floor(percentage / 5))]),
+            "".join(["░" for _ in range(20 - math.floor(percentage / 5))]),
             round(percentage, 2),
         )
         tmp = progress_str + "{0} of {1}\nETA: {2}".format(
             humanbytes(current), humanbytes(total), time_formatter(estimated_total_time)
         )
         if file_name:
-            await event.edit(
-                "{}\nFile Name: `{}`\n{}".format(type_of_ps, file_name, tmp)
-            )
+            await event.edit(f"{type_of_ps}\nFile Name: `{file_name}`\n{tmp}")
         else:
-            await event.edit("{}\n{}".format(type_of_ps, tmp))
+            await event.edit(f"{type_of_ps}\n{tmp}")
 
 
 def humanbytes(size):
@@ -465,22 +462,22 @@ def humanbytes(size):
     while size > power:
         size /= power
         raised_to_pow += 1
-    return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
+    return f"{str(round(size, 2))} {dict_power_n[raised_to_pow]}B"
 
 
 def time_formatter(milliseconds: int) -> str:
     """Inputs time in milliseconds, to get beautified time,
     as string"""
-    seconds, milliseconds = divmod(int(milliseconds), 1000)
+    seconds, milliseconds = divmod(milliseconds, 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
     tmp = (
-        ((str(days) + " day(s), ") if days else "")
-        + ((str(hours) + " hour(s), ") if hours else "")
-        + ((str(minutes) + " minute(s), ") if minutes else "")
-        + ((str(seconds) + " second(s), ") if seconds else "")
-        + ((str(milliseconds) + " millisecond(s), ") if milliseconds else "")
+        (f"{str(days)} day(s), " if days else "")
+        + (f"{str(hours)} hour(s), " if hours else "")
+        + (f"{str(minutes)} minute(s), " if minutes else "")
+        + (f"{str(seconds)} second(s), " if seconds else "")
+        + (f"{str(milliseconds)} millisecond(s), " if milliseconds else "")
     )
     return tmp[:-2]
 
@@ -523,8 +520,7 @@ def sudo_cmd(pattern=None, **args):
         args["outgoing"] = True
     # add blacklist chats, UB should not respond in these chats
     args["blacklist_chats"] = True
-    black_list_chats = list(Config.UB_BLACK_LIST_CHAT)
-    if len(black_list_chats) > 0:
+    if black_list_chats := list(Config.UB_BLACK_LIST_CHAT):
         args["chats"] = black_list_chats
     # add blacklist chats, UB should not respond in these chats
     if "allow_edited_updates" in args and args["allow_edited_updates"]:
@@ -640,8 +636,6 @@ def god_only():
             moms = bot.uid
             if event.sender_id == moms:
                 await func(event)
-            else:
-                pass
 
         return wrapper
 
@@ -668,8 +662,6 @@ def only_group():
         async def wrapper(event):
             if event.is_group:
                 await func(event)
-            else:
-                pass
 
         return wrapper
 
@@ -684,8 +676,6 @@ def peru_only():
             kek.append(bot.uid)
             if event.sender_id in kek:
                 await func(event)
-            else:
-                pass
 
         return wrapper
 
@@ -696,9 +686,7 @@ def only_pvt():
     def decorator(func):
         @functools.wraps(func)
         async def wrapper(event):
-            if event.is_group:
-                pass
-            else:
+            if not event.is_group:
                 await func(event)
 
         return wrapper
@@ -715,19 +703,19 @@ def start_assistant(shortname):
         from pathlib import Path
 
         path = Path(f"fridaybot/modules/assistant/{shortname}.py")
-        name = "fridaybot.modules.assistant.{}".format(shortname)
+        name = f"fridaybot.modules.assistant.{shortname}"
         spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
         sedprint.info("Starting Your Assistant Bot.")
-        sedprint.info("Assistant Sucessfully imported " + shortname)
+        sedprint.info(f"Assistant Sucessfully imported {shortname}")
     else:
         import importlib
         import sys
         from pathlib import Path
 
         path = Path(f"fridaybot/modules/assistant/{shortname}.py")
-        name = "fridaybot.modules.assistant.{}".format(shortname)
+        name = f"fridaybot.modules.assistant.{shortname}"
         spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(spec)
         mod.tgbot = bot.tgbot
@@ -743,5 +731,5 @@ def start_assistant(shortname):
         mod.peru_only = peru_only()
         mod.only_pvt = only_pvt()
         spec.loader.exec_module(mod)
-        sys.modules["fridaybot.modules.assistant" + shortname] = mod
-        sedprint.info("Assistant Has imported " + shortname)
+        sys.modules[f"fridaybot.modules.assistant{shortname}"] = mod
+        sedprint.info(f"Assistant Has imported {shortname}")

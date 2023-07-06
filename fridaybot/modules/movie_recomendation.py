@@ -46,7 +46,7 @@ async def _(event):
     a = main(emotion)
     count = 0
     sed = ""
-    if emotion == "Disgust" or emotion == "Anger" or emotion == "Surprise":
+    if emotion in ["Disgust", "Anger", "Surprise"]:
         for i in a:
             tmp = str(i).split(">;")
             if len(tmp) == 3:
