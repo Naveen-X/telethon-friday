@@ -24,8 +24,8 @@ async def fun(e):
     if e.fwd_from:
         return
     t = ";__;"
-    for j in range(10):
-        t = t[:-1] + "_;"
+    for _ in range(10):
+        t = f"{t[:-1]}_;"
         await e.edit(t)
 
 
@@ -34,8 +34,8 @@ async def Ooo(e):
     if e.fwd_from:
         return
     t = "yo"
-    for j in range(15):
-        t = t[:-1] + "oo"
+    for _ in range(15):
+        t = f"{t[:-1]}oo"
         await e.edit(t)
 
 
@@ -44,8 +44,8 @@ async def Oof(e):
     if e.fwd_from:
         return
     t = "Oof"
-    for j in range(15):
-        t = t[:-1] + "of"
+    for _ in range(15):
+        t = f"{t[:-1]}of"
         await e.edit(t)
 
 

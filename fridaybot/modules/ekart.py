@@ -23,9 +23,9 @@ async def _(event):
     if event.fwd_from:
         return
     input_str = event.pattern_match.group(1)
-    urlo = "https://track.aftership.com/trackings?courier=ekart&tracking-numbers=" + str(input_str)
-    
-    url = "https://ekart-api-chi.vercel.app/check?id=" + str(input_str)
+    urlo = f"https://track.aftership.com/trackings?courier=ekart&tracking-numbers={str(input_str)}"
+
+    url = f"https://ekart-api-chi.vercel.app/check?id={str(input_str)}"
     r = requests.get(url)
     h = r.json()
     merchant = h.get("merchant_name")
@@ -36,8 +36,8 @@ async def _(event):
     ar = oqwz.get("Time")
     place = oqwz.get("Place")
     status = oqwz.get("Status")
-    
-    
+
+
     caption = f""" <b>Ekart Tracking </b>
 
 Merchant Name:- {merchant}

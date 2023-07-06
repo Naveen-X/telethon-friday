@@ -24,11 +24,7 @@ async def _(event):
         return
     input_str = event.pattern_match.group(1)
     result = quote(input_str, limit=3)
-    sed = ""
-
-    for quotes in result:
-        sed += str(quotes["quote"]) + "\n\n"
-
+    sed = "".join(str(quotes["quote"]) + "\n\n" for quotes in result)
     await event.edit(
         f"<b><u>Quotes Successfully Gathered for given word </b></u><code>{input_str}</code>\n\n\n<code>{sed}</code>",
         parse_mode="HTML",

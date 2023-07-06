@@ -32,40 +32,37 @@ if not os.path.isdir(Config.TMP_DOWNLOAD_DIRECTORY):
   
 @friday.on(friday_on_cmd(pattern=r"ci2pdf(?: |$)(.*)"))
 async def heck(event):
-    if event.fwd_from:
-        return  
-    un = event.pattern_match.group(1)
-    rndm = uuid.uuid4().hex
-    dir = f"./{rndm}/"
-    media_count = 0
-    text_count = 0
-    os.makedirs(dir)
-    if un:
-        chnnl = un
-    else:
-        chnnl = event.chat_id
-    await event.edit(f"**Fetching All Images From This Channel**")
-    try:
-        chnnl_msgs = await borg.get_messages(chnnl, limit=3000, filter=InputMessagesFilterPhotos)
-    except:
-        await event.edit("**Unable To fetch Messages !** \n`Please, Check Channel Details And IF There Are Any Images :/`")
-        return
-    total = int(chnnl_msgs.total)
-    await event.edit(f"**Downloading {total} Images**")
-    for d in chnnl_msgs:
-        media_count += 1
-        await borg.download_media(d.media, dir)
-    images_path = []
-    images_names = os.listdir(dir)
-    for i in images_names:
-        path = os.path.join(dir, i)
-        images_path.append(path)
-    with open('imagetopdf@fridayot.pdf', "wb") as f:
-        f.write(img2pdf.convert(images_path))    
-    await event.delete()    
-    await borg.send_file(event.chat_id, "imagetopdf@fridayot.pdf", caption="Powered By @FridayOT")  
-    os.remove("imagetopdf@fridayot.pdf")
-    shutil.rmtree(dir)
+  if event.fwd_from:
+      return
+  un = event.pattern_match.group(1)
+  rndm = uuid.uuid4().hex
+  dir = f"./{rndm}/"
+  media_count = 0
+  text_count = 0
+  os.makedirs(dir)
+  chnnl = un if un else event.chat_id
+  await event.edit("**Fetching All Images From This Channel**")
+  try:
+      chnnl_msgs = await borg.get_messages(chnnl, limit=3000, filter=InputMessagesFilterPhotos)
+  except:
+      await event.edit("**Unable To fetch Messages !** \n`Please, Check Channel Details And IF There Are Any Images :/`")
+      return
+  total = int(chnnl_msgs.total)
+  await event.edit(f"**Downloading {total} Images**")
+  for d in chnnl_msgs:
+      media_count += 1
+      await borg.download_media(d.media, dir)
+  images_path = []
+  images_names = os.listdir(dir)
+  for i in images_names:
+      path = os.path.join(dir, i)
+      images_path.append(path)
+  with open('imagetopdf@fridayot.pdf', "wb") as f:
+      f.write(img2pdf.convert(images_path))
+  await event.delete()
+  await borg.send_file(event.chat_id, "imagetopdf@fridayot.pdf", caption="Powered By @FridayOT")
+  os.remove("imagetopdf@fridayot.pdf")
+  shutil.rmtree(dir)
     
     
 @friday.on(friday_on_cmd(pattern=r"pdf2docx"))

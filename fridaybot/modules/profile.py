@@ -26,16 +26,13 @@ async def _(event):
         await event.edit("`Reply To User To Add Him In Contact.`")
         return
     user_s = await event.client.get_entity(id_s)
-    if user_s.last_name is None:
-        sed_m = " "
-    else:
-        sed_m = user_s.last_name
+    sed_m = " " if user_s.last_name is None else user_s.last_name
     await event.client(functions.contacts.AddContactRequest(
         id=id_s, 
         first_name=user_s.first_name, 
         last_name=sed_m, 
         phone='123456', 
-        add_phone_privacy_exception=True)) 
+        add_phone_privacy_exception=True))
     star = await event.edit("**Added To Contacts SucessFully**")
     await asyncio.sleep(3)
     await star.delete()   

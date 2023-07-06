@@ -83,12 +83,10 @@ async def get_other_plugins(Config, client_s, fridaydevs):
     except:
         fridaydevs.info("Failed To Other Modules :(")
         return
+    pathh = "fridaybot/modules/"
     for meisnub in a_plugins:
         hmm = meisnub.media.document.attributes[-1].file_name
-        pathh = "fridaybot/modules/"
-        if os.path.exists(os.path.join(pathh, hmm)):
-            pass
-        else:
+        if not os.path.exists(os.path.join(pathh, hmm)):
             await client_s.download_media(meisnub.media, "fridaybot/modules/")
     fridaydevs.info("Extra Plugins Downloaded.")
 
@@ -108,7 +106,7 @@ else:
 
 if Config.LOAD_OTHER_PLUGINS:
         bot.loop.run_until_complete(get_other_plugins(Config, bot, fridaydevs))
-        
+
 import glob
 
 path = "fridaybot/modules/*.py"
@@ -153,10 +151,10 @@ if failed2 is None:
     total_clients += 1
 if failed3 is None:
     total_clients += 1
-    
+
 if wsta[0].lower() != Lol[0]:
    sys.exit("Bug Detected ! // UserBot is Exiting.")
-    
+
 fridaydevs.info(f"""{wsta}
 -------------------------------------------
 Friday-Userbot Based On Telethon V{tv}
@@ -166,10 +164,11 @@ Support Chat : @FridayChat
 Updates Channel : @FridaySupportOfficial
 Total Clients : {total_clients}
 -------------------------------------------""")
-        
+
 bot.tgbot.loop.run_until_complete(check_inline_on_warner(bot.tgbot))
 
-if len(argv) not in (1, 3, 4):
-    bot.disconnect()
-else:
+if len(argv) in {1, 3, 4}:
     bot.run_until_disconnected()
+
+else:
+    bot.disconnect()

@@ -117,42 +117,39 @@ def order_points(pts):
 	return rect
 
 def four_point_transform(image, pts):
-	# obtain a consistent order of the points and unpack them
-	# individually
-	rect = order_points(pts)
-	(tl, tr, br, bl) = rect
- 
-	# compute the width of the new image, which will be the
-	# maximum distance between bottom-right and bottom-left
-	# x-coordiates or the top-right and top-left x-coordinates
-	widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
-	widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
-	maxWidth = max(int(widthA), int(widthB))
- 
-	# compute the height of the new image, which will be the
-	# maximum distance between the top-right and bottom-right
-	# y-coordinates or the top-left and bottom-left y-coordinates
-	heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
-	heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
-	maxHeight = max(int(heightA), int(heightB))
- 
-	# now that we have the dimensions of the new image, construct
-	# the set of destination points to obtain a "birds eye view",
-	# (i.e. top-down view) of the image, again specifying points
-	# in the top-left, top-right, bottom-right, and bottom-left
-	# order
-	dst = np.array([
-		[0, 0],
-		[maxWidth - 1, 0],
-		[maxWidth - 1, maxHeight - 1],
-		[0, maxHeight - 1]], dtype = "float32")
- 
-	# compute the perspective transform matrix and then apply it
-	M = cv2.getPerspectiveTransform(rect, dst)
-	warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
- 
-	# return the warped image
-	return warped
+    # obtain a consistent order of the points and unpack them
+    # individually
+    rect = order_points(pts)
+    (tl, tr, br, bl) = rect
+
+    # compute the width of the new image, which will be the
+    # maximum distance between bottom-right and bottom-left
+    # x-coordiates or the top-right and top-left x-coordinates
+    widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
+    widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
+    maxWidth = max(int(widthA), int(widthB))
+
+    # compute the height of the new image, which will be the
+    # maximum distance between the top-right and bottom-right
+    # y-coordinates or the top-left and bottom-left y-coordinates
+    heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+    heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
+    maxHeight = max(int(heightA), int(heightB))
+
+    # now that we have the dimensions of the new image, construct
+    # the set of destination points to obtain a "birds eye view",
+    # (i.e. top-down view) of the image, again specifying points
+    # in the top-left, top-right, bottom-right, and bottom-left
+    # order
+    dst = np.array([
+    	[0, 0],
+    	[maxWidth - 1, 0],
+    	[maxWidth - 1, maxHeight - 1],
+    	[0, maxHeight - 1]], dtype = "float32")
+
+    # compute the perspective transform matrix and then apply it
+    M = cv2.getPerspectiveTransform(rect, dst)
+    return cv2.warpPerspective(image, M, (maxWidth, maxHeight))
     
 def get_readable_file_size(size_in_bytes: Union[int, float]) -> str:
     if size_in_bytes is None:
@@ -215,31 +212,22 @@ async def progress(current, total, event, start, type_of_ps, file_name=None):
         time_to_completion = round((total - current) / speed) * 1000
         estimated_total_time = elapsed_time + time_to_completion
         progress_str = "{0}{1} {2}%\n".format(
-            "".join(["▰" for i in range(math.floor(percentage / 10))]),
-            "".join(["▱" for i in range(10 - math.floor(percentage / 10))]),
+            "".join(["▰" for _ in range(math.floor(percentage / 10))]),
+            "".join(["▱" for _ in range(10 - math.floor(percentage / 10))]),
             round(percentage, 2),
         )
         tmp = progress_str + "{0} of {1}\nETA: {2}".format(
             humanbytes(current), humanbytes(total), time_formatter(estimated_total_time)
         )
-        if file_name:
-            try:
-                await event.edit(
-                    "{}\n**File Name:** `{}`\n{}".format(type_of_ps, file_name, tmp)
-                    
-                )
-            except:
-                pass
-        else:
-            try:
-                await event.edit("{}\n{}".format(type_of_ps, tmp))
-            except:
-                pass
+        try:
+            if file_name:
+                await event.edit(f"{type_of_ps}\n**File Name:** `{file_name}`\n{tmp}")
+            else:
+                await event.edit(f"{type_of_ps}\n{tmp}")
+        except:
+            pass
 async def all_pro_s(Config, client2, client3, bot):
-    if not Config.SUDO_USERS:
-        lmao_s = []
-    else:
-        lmao_s = list(Config.SUDO_USERS)
+    lmao_s = [] if not Config.SUDO_USERS else list(Config.SUDO_USERS)
     sed1 = await bot.get_me()
     lmao_s.append(sed1.id)
     if client2:
@@ -263,7 +251,7 @@ def humanbytes(size):
     while size > power:
         size /= power
         raised_to_pow += 1
-    return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
+    return f"{str(round(size, 2))} {dict_power_n[raised_to_pow]}B"
 
 async def get_all_modules(event, borg, channel_id):
     await event.edit(f"Ìnstalling All Plugins from {channel_id}")
@@ -291,38 +279,35 @@ async def get_all_modules(event, borg, channel_id):
                 path1 = Path(downloaded_file_name)
                 shortname = path1.stem
                 load_module(shortname.replace(".py", ""))
-                await event.edit("**Installed :** `{}`".format(os.path.basename(downloaded_file_name)
-                                                              )
-                                )
+                await event.edit(f"**Installed :** `{os.path.basename(downloaded_file_name)}`")
             else:
                 nom += 1
-                await event.edit("**Failed to Install [PLugin Already Found] :** `{}`".format(os.path.basename(downloaded_file_name)
-                                                              )
-                                )
+                await event.edit(
+                    f"**Failed to Install [PLugin Already Found] :** `{os.path.basename(downloaded_file_name)}`"
+                )
                 os.remove(downloaded_file_name)
         except:
-                await event.edit("**Failed To Install :** `{}`".format(os.path.basename(downloaded_file_name)
-                                                              )
-                                )
-                os.remove(downloaded_file_name)
-                nom += 1
-                pass
+            await event.edit(
+                f"**Failed To Install :** `{os.path.basename(downloaded_file_name)}`"
+            )
+            os.remove(downloaded_file_name)
+            nom += 1
     yesm = len_p - nom
     return yesm, nom, len_p
 
 def time_formatter(milliseconds: int) -> str:
     """Inputs time in milliseconds, to get beautified time,
     as string"""
-    seconds, milliseconds = divmod(int(milliseconds), 1000)
+    seconds, milliseconds = divmod(milliseconds, 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
     tmp = (
-            ((str(days) + " day(s), ") if days else "")
-            + ((str(hours) + " hour(s), ") if hours else "")
-            + ((str(minutes) + " minute(s), ") if minutes else "")
-            + ((str(seconds) + " second(s), ") if seconds else "")
-            + ((str(milliseconds) + " millisecond(s), ") if milliseconds else "")
+        (f"{str(days)} day(s), " if days else "")
+        + (f"{str(hours)} hour(s), " if hours else "")
+        + (f"{str(minutes)} minute(s), " if minutes else "")
+        + (f"{str(seconds)} second(s), " if seconds else "")
+        + (f"{str(milliseconds)} millisecond(s), " if milliseconds else "")
     )
     return tmp[:-2]
 
@@ -356,9 +341,7 @@ async def convert_to_image(event, borg):
         except Exception as e:  # pylint:disable=C0103,W0703
             await event.edit(str(e))
         else:
-            await event.edit(
-                "Downloaded to `{}` successfully.".format(downloaded_file_name)
-            )
+            await event.edit(f"Downloaded to `{downloaded_file_name}` successfully.")
     if not os.path.exists(downloaded_file_name):
         await event.edit("Download Unsucessfull :(")
         return
@@ -373,7 +356,7 @@ async def convert_to_image(event, borg):
         lmao_final = image_name20
     elif lmao.sticker and lmao.sticker.mime_type == "image/webp":
         pathofsticker2 = downloaded_file_name
-        image_new_path = sedpath + "image.png"
+        image_new_path = f"{sedpath}image.png"
         im = Image.open(pathofsticker2)
         im.save(image_new_path, "PNG")
         if not os.path.exists(image_new_path):
@@ -382,8 +365,8 @@ async def convert_to_image(event, borg):
         lmao_final = image_new_path
     elif lmao.audio:
         sed_p = downloaded_file_name
-        hmmyes = sedpath + "stark.mp3"
-        imgpath = sedpath + "starky.jpg"
+        hmmyes = f"{sedpath}stark.mp3"
+        imgpath = f"{sedpath}starky.jpg"
         os.rename(sed_p, hmmyes)
         await runcmd(f"ffmpeg -i {hmmyes} -filter:v scale=500:500 -an {imgpath}")
         os.remove(sed_p)
@@ -412,7 +395,7 @@ async def crop_vid(input_vid: str, final_path: str):
             height = track.height
             width = track.width
     if aspect_ratio != 1:
-        crop_by = width if (height > width) else height
+        crop_by = min(height, width)
         os.system(f'ffmpeg -i {input_vid} -vf "crop={crop_by}:{crop_by}" {final_path}')
         os.remove(input_vid)
     else:
@@ -504,7 +487,7 @@ async def fetch_feds(event, borg):
 
 
 async def get_imdb_id(search, event):
-    link = "https://yts-subs.com/search/ajax?mov=" + search
+    link = f"https://yts-subs.com/search/ajax?mov={search}"
     lol = requests.get(link)
     warner_bros = lol.json()
     if warner_bros == []:
@@ -519,7 +502,7 @@ async def get_imdb_id(search, event):
 
 async def get_subtitles(imdb_id, borg, event):
     await event.edit("`Processing..`")
-    link = f"https://yts-subs.com/movie-imdb/" + imdb_id
+    link = f"https://yts-subs.com/movie-imdb/{imdb_id}"
     movie_response = requests.get(url=link)
     subtitles = []
     soup1 = BeautifulSoup(movie_response.content, "html.parser")
@@ -547,10 +530,10 @@ async def get_subtitles(imdb_id, borg, event):
     final_response = requests.get(link, stream=True)
     await event.edit("`Downloading Now`")
     if final_response.status_code == 200:
-        with open(sedpath + f"{selected_sub_name}.zip", "wb") as sfile:
+        with open(f"{sedpath}{selected_sub_name}.zip", "wb") as sfile:
             for byte in final_response.iter_content(chunk_size=128):
                 sfile.write(byte)
-    final_paths = sedpath + f"{selected_sub_name}.zip"
+    final_paths = f"{sedpath}{selected_sub_name}.zip"
     namez = selected_sub_name
     return final_paths, namez, subtitles[0]["sub_link"]
 
@@ -726,9 +709,7 @@ async def get_all_admin_chats(event):
             if (d.is_group or d.is_channel)
         ]
     try:
-        for i in all_chats:
-            if i.creator or i.admin_rights:
-                lul_stark.append(i.id)
+        lul_stark.extend(i.id for i in all_chats if i.creator or i.admin_rights)
     except:
         pass
     return lul_stark
@@ -737,10 +718,7 @@ async def get_all_admin_chats(event):
 async def is_admin(event, user):
     try:
         sed = await event.client.get_permissions(event.chat_id, user)
-        if sed.is_admin:
-            is_mod = True
-        else:
-            is_mod = False
+        is_mod = bool(sed.is_admin)
     except:
         is_mod = False
     return is_mod
@@ -791,14 +769,14 @@ async def is_nsfw(event):
             starkstark = await event.client.download_media(lmao.media, thumb=-1)
         except:
             return False
-    elif lmao.photo or lmao.sticker:
+    elif lmao.photo:
         try:
             starkstark = await event.client.download_media(lmao.media)
         except:
             return False
     img = starkstark
     f = {"file": (img, open(img, "rb"))}
-    
+
     r = requests.post("https://starkapi.herokuapp.com/nsfw/", files = f).json()
     if r.get("success") is False:
       is_nsfw = False
@@ -852,6 +830,5 @@ class Track_Mobile_Number:
         soup = BeautifulSoup(html.text, "html.parser")
         if soup.find("title").text.strip() != "404 NOT FOUND":
             mobile_tracker_valve = [i.text.strip() for i in soup.find_all("td")]
-            mobile_tracker = dict(zip(mobile_tracker_key, mobile_tracker_valve))
-            return mobile_tracker
+            return dict(zip(mobile_tracker_key, mobile_tracker_valve))
         raise Exception("Mobile Number Not Found")

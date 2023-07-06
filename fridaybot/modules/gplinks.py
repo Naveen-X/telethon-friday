@@ -33,19 +33,19 @@ async def _(event):
     wtf = input_str.split(" ",1)
     ok = (wtf[0])
     no = (wtf[1])
-    
-    
+
+
     r = requests.get(f"https://gplinks.in/api?api={Config.GPLINKS_API_KEY}&url={ok}&alias={no}")
-    
+
     kk = r.json()
     if kk.get("status")=="error":
-	    ko = kk.get("message")
-	    ok= ko [0]
-	    hel = "Error, Reason:-  "+ok
+        ko = kk.get("message")
+        ok= ko [0]
+        hel = f"Error, Reason:-  {ok}"
     elif kk.get("status")=="success":
-      
+
       pop = kk.get("shortenedUrl")
-      
+
       hel = f"""
  
  Link Generated Successfully
@@ -53,15 +53,15 @@ async def _(event):
 Given Link:- {ok}
 
 Shortened Link:- {pop}"""
-    
-    
-    
+
+
+
     await borg.send_message(
         event.chat_id,
         hel,
         parse_mode="HTML"
     )
-    
+
     await event.delete()
 
 

@@ -3,6 +3,7 @@
 Syntax:
 .rnupload file.name"""
 
+
 import os
 import time
 from datetime import datetime
@@ -11,16 +12,14 @@ from uniborg.util import friday_on_cmd
 
 from fridaybot import CMD_HELP
 
-thumb_image_path = Config.TMP_DOWNLOAD_DIRECTORY + "/thumb_image.jpg"
+thumb_image_path = f"{Config.TMP_DOWNLOAD_DIRECTORY}/thumb_image.jpg"
 
 
 @friday.on(friday_on_cmd(pattern="rnupload (.*)"))
 async def _(event):
     if event.fwd_from:
         return
-    thumb = None
-    if os.path.exists(thumb_image_path):
-        thumb = thumb_image_path
+    thumb = thumb_image_path if os.path.exists(thumb_image_path) else None
     await event.edit("⚡️`Rename and upload in progress, please wait!`⚡️")
     input_str = event.pattern_match.group(1)
     if not os.path.isdir(Config.TMP_DOWNLOAD_DIRECTORY):
@@ -52,12 +51,10 @@ async def _(event):
             os.remove(downloaded_file_name)
             ms_two = (end_two - end).seconds
             await event.edit(
-                "Downloaded in {} seconds. Uploaded in {} seconds.".format(
-                    ms_one, ms_two
-                )
+                f"Downloaded in {ms_one} seconds. Uploaded in {ms_two} seconds."
             )
         else:
-            await event.edit("File Not Found {}".format(input_str))
+            await event.edit(f"File Not Found {input_str}")
     else:
         await event.edit("Syntax // .rnupload file.name as reply to a Telegram media")
 

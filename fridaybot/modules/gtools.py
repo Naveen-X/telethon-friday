@@ -59,10 +59,7 @@ async def gbun(event):
     if not user:
         await event.edit("`Kindly, Mention A User To Gban`")
         return
-    if not reason or reason is None:
-        hmm_r = "#GBanned"
-    elif reason:
-        hmm_r = reason
+    hmm_r = "#GBanned" if not reason or reason is None else reason
     if user.id in o:
         await event.edit("**I Can't Gban You Master / Sudo Users :(**")
         return
@@ -202,9 +199,7 @@ async def startgmute(event):
     if event.fwd_from:
         return
     private = False
-    if event.fwd_from:
-        return
-    elif event.is_private:
+    if event.is_private:
         await event.edit("Unexpected issues or ugly errors may occur!")
         await asyncio.sleep(3)
         private = True
@@ -213,7 +208,7 @@ async def startgmute(event):
         userid = event.pattern_match.group(1)
     elif reply is not None:
         userid = reply.sender_id
-    elif private is True:
+    elif private:
         userid = event.chat_id
     else:
         return await event.edit(
@@ -236,9 +231,7 @@ async def endgmute(event):
     if event.fwd_from:
         return
     private = False
-    if event.fwd_from:
-        return
-    elif event.is_private:
+    if event.is_private:
         await event.edit("Unexpected issues or ugly errors may occur!")
         await asyncio.sleep(3)
         private = True
@@ -247,7 +240,7 @@ async def endgmute(event):
         userid = event.pattern_match.group(1)
     elif reply is not None:
         userid = reply.sender_id
-    elif private is True:
+    elif private:
         userid = event.chat_id
     else:
         return await event.edit(

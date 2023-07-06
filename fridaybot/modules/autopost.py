@@ -20,10 +20,7 @@ async def lol(event):
         await event.edit("`Only Channels Can Use THis Feature.`")
         return
     sed = event.pattern_match.group(1)
-    if str(sed).startswith("-100"):
-        kk = str(sed).replace("-100", "")
-    else:
-        kk = sed
+    kk = str(sed).replace("-100", "") if str(sed).startswith("-100") else sed
     if not kk.isdigit():
         await event.edit("`Channel ID Should be Integers`")
         return
@@ -39,10 +36,7 @@ async def lol(event):
         await event.edit("`Only Channels Can Use THis Feature.`")
         return
     sed = event.pattern_match.group(1)
-    if str(sed).startswith("-100"):
-        kk = str(sed).replace("-100", "")
-    else:
-        kk = sed
+    kk = str(sed).replace("-100", "") if str(sed).startswith("-100") else sed
     if not kk.isdigit():
         await event.edit("`Channel ID Should be Integers`")
         return
@@ -63,5 +57,5 @@ async def what(event):
     for chat in channels_set:
         if event.media:
             await event.client.send_file(int(chat), event.media, caption=event.text)
-        elif not event.media:
+        else:
             await event.client.send_message(int(chat), event.message)

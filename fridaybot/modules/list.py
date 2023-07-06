@@ -18,15 +18,14 @@ async def lst(event):
     genesis = await edit_or_reply(event, "Processing")
     if event.fwd_from:
         return
-    input_str = event.pattern_match.group(1)
-    if input_str:
-        msg = "**Files in {} :**\n".format(input_str)
+    if input_str := event.pattern_match.group(1):
+        msg = f"**Files in {input_str} :**\n"
         files = os.listdir(input_str)
     else:
         msg = "**Files in Current Directory :**\n"
         files = os.listdir(os.getcwd())
     for file in files:
-        msg += "`{}`\n".format(file)
+        msg += f"`{file}`\n"
     if len(msg) <= Config.MAX_MESSAGE_SIZE_LIMIT:
         await genesis.edit(msg)
     else:

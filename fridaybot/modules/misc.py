@@ -46,7 +46,7 @@ async def sleepybot(time):
             if LOGGER:
                 await time.client.send_message(
                     LOGGER_GROUP,
-                    "You put the bot to sleep for " + str(counter) + " seconds",
+                    f"You put the bot to sleep for {counter} seconds",
                 )
             sleep(counter)
 

@@ -41,7 +41,7 @@ async def _(event):
             response = conv.wait_event(
                 events.NewMessage(incoming=True, from_users=461843263)
             )
-            await borg.send_message("@SangMataInfo_bot", "/search_id " + str(sw))
+            await borg.send_message("@SangMataInfo_bot", f"/search_id {str(sw)}")
             response1 = await response
             response2 = await response
             if response2.text.startswith("No records"):
@@ -68,7 +68,7 @@ async def _(event):
     chat = "@fakemailbot"
     reply_message.sender
     await event.edit("```Processing```")
-    link = f"/generate"
+    link = "/generate"
     async with borg.conversation(chat) as conv:
         try:
             response = conv.wait_event(

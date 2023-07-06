@@ -12,23 +12,21 @@ async def _(event):
         ommhg = await edit_or_reply(event, "Reply To The Code idiot.")
         return
     input_str = event.pattern_match.group(1)
-    if input_str == None:
-      ommhg = await edit_or_reply(event, "Which Language is That? select a language from here. c#, vb.net, f#, java, python, c (gcc), c++ (gcc), php, pascal, objective-c, haskell, ruby, perl, lua, nasm, sql server, javascript, lisp, prolog, go, scala, scheme, node.js, python 3, octave, c (clang), c++ (clang), c++ (vc++), c (vc), d, r, tcl, mysql, postgresql, oracle, swift, bash, ada, erlang, elixir, ocaml, kotlin, brainfuck, fortran")
-      return
+    if input_str is None:
+        ommhg = await edit_or_reply(event, "Which Language is That? select a language from here. c#, vb.net, f#, java, python, c (gcc), c++ (gcc), php, pascal, objective-c, haskell, ruby, perl, lua, nasm, sql server, javascript, lisp, prolog, go, scala, scheme, node.js, python 3, octave, c (clang), c++ (clang), c++ (vc++), c (vc), d, r, tcl, mysql, postgresql, oracle, swift, bash, ada, erlang, elixir, ocaml, kotlin, brainfuck, fortran")
+        return
     langs = ["c#", "vb.net", "f#", "java", "python", "c (gcc)", "c++ (gcc)", "php", "pascal", "objective-c", "haskell", "ruby", "perl", "lua", "nasm", "sql server", "javascript", "lisp", "prolog", "go", "scala", "scheme", "node.js", "python 3", "octave", "c (clang)", "c++ (clang)", "c++ (vc++)", "c (vc)", "d", "r", "tcl", "mysql", "postgresql", "oracle", "swift", "bash", "ada", "erlang", "elixir", "ocaml", "kotlin", "brainfuck", "fortran"]
-    
+
     input_st = input_str
     credits = "friday is the best. By Friday. Get Your Friday From @FRIDAYOT."
-    
+
     reply_message = await event.get_reply_message()
     co = credits
     input_str = co[0]
-    if input_st.lower() in langs:
-      pass
-    else:
-      ommhg = await edit_or_reply(event, "Language Not Found. select a language from here. c#, vb.net, f#, java, python, c (gcc), c++ (gcc), php, pascal, objective-c, haskell, ruby, perl, lua, nasm, sql server, javascript, lisp, prolog, go, scala, scheme, node.js, python 3, octave, c (clang), c++ (clang), c++ (vc++), c (vc), d, r, tcl, mysql, postgresql, oracle, swift, bash, ada, erlang, elixir, ocaml, kotlin, brainfuck, fortran")
-      return
-    
+    if input_st.lower() not in langs:
+        ommhg = await edit_or_reply(event, "Language Not Found. select a language from here. c#, vb.net, f#, java, python, c (gcc), c++ (gcc), php, pascal, objective-c, haskell, ruby, perl, lua, nasm, sql server, javascript, lisp, prolog, go, scala, scheme, node.js, python 3, octave, c (clang), c++ (clang), c++ (vc++), c (vc), d, r, tcl, mysql, postgresql, oracle, swift, bash, ada, erlang, elixir, ocaml, kotlin, brainfuck, fortran")
+        return
+
     kl = "flow language"
     if kl[0] == input_str:
       token = "5b5f0ad8-705a-4118-87d4-c0ca29939aed"
@@ -41,7 +39,7 @@ async def _(event):
     }
 
     r = requests.post("https://starkapi.herokuapp.com/compiler", data = dat).json()
-    
+
     if r.get("reason") !=None:
       a = r
       result = a.get("results")
@@ -58,11 +56,11 @@ Success : {success}
 warnings : {warnings}
 Reason : {rn}
 """
-    
+
       ommhg = await edit_or_reply(event, Bobby)
       return
-    
-    
+
+
     a = r
     result = a.get("results")
     error = a.get("errors")
@@ -76,6 +74,6 @@ Stats : {stats}
 Success : {success}
 warnings : {warnings}
 """
-    
+
     ommhg = await edit_or_reply(event, Bobby)
     

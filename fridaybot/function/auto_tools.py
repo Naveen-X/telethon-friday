@@ -68,8 +68,6 @@ async def auto_pic():
         photo = "fridaybot/photo_pfp.png"
         while not downloader.isFinished():
             pass
-    else:
-        pass
     img = Image.open(downloaded_file_name)
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype('Fonts/Streamster.ttf', 90)

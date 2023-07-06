@@ -243,9 +243,7 @@ async def promote(event):
     user, rank = await get_user_from_event(event)
     if not rank:
         rank = "admeme"  # Just in case.
-    if user:
-        pass
-    else:
+    if not user:
         return
 
     # Try to promote if current user is admin or creator
@@ -291,9 +289,7 @@ async def demote(event):
     poppo = await edit_or_reply(event, "`Demoting...`")
     rank = "admeme"  # dummy rank, lol.
     user, reason = await get_user_from_event(event)
-    if user:
-        pass
-    else:
+    if not user:
         return
     # New rights after demotion
     newrights = ChatAdminRights(
@@ -346,9 +342,7 @@ async def ban(event):
         return
 
     user, reason = await get_user_from_event(event)
-    if user:
-        pass
-    else:
+    if not user:
         return
 
     # Announce that we're going to whack the pest
@@ -410,9 +404,7 @@ async def nothanos(event):
 
     user = await get_user_from_event(event)
     user = user[0]
-    if user:
-        pass
-    else:
+    if not user:
         return
 
     try:
@@ -458,9 +450,7 @@ async def spider(event):
         return
 
     user, reason = await get_user_from_event(event)
-    if user:
-        pass
-    else:
+    if not user:
         return
 
     self_user = await event.client.get_me()
@@ -473,26 +463,25 @@ async def spider(event):
     poppo = await edit_or_reply(event, "`Gets a tape!`")
     if mute(event.chat_id, user.id) is False:
         return await poppo.edit("`Error! User probably already muted.`")
-    else:
-        try:
-            await event.client(EditBannedRequest(event.chat_id, user.id, MUTE_RIGHTS))
+    try:
+        await event.client(EditBannedRequest(event.chat_id, user.id, MUTE_RIGHTS))
 
-            # Announce that the function is done
-            if reason:
-                await poppo.edit(f"`Safely taped !!`\nReason: {reason}")
-            else:
-                await poppo.edit("`Safely taped !!`")
+        # Announce that the function is done
+        if reason:
+            await poppo.edit(f"`Safely taped !!`\nReason: {reason}")
+        else:
+            await poppo.edit("`Safely taped !!`")
 
-            # Announce to logging group
-            if BOTLOG:
-                await event.client.send_message(
-                    BOTLOG_CHATID,
-                    "#MUTE\n"
-                    f"USER: [{user.first_name}](tg://user?id={user.id})\n"
-                    f"CHAT: {event.chat.title}(`{event.chat_id}`)",
-                )
-        except UserIdInvalidError:
-            return await event.edit("`Uh oh my mute logic broke!`")
+        # Announce to logging group
+        if BOTLOG:
+            await event.client.send_message(
+                BOTLOG_CHATID,
+                "#MUTE\n"
+                f"USER: [{user.first_name}](tg://user?id={user.id})\n"
+                f"CHAT: {event.chat.title}(`{event.chat_id}`)",
+            )
+    except UserIdInvalidError:
+        return await event.edit("`Uh oh my mute logic broke!`")
 
 
 # @register(outgoing=True, pattern="^.unmute(?: |$)(.*)")
@@ -526,29 +515,25 @@ async def unmoot(event):
     poppo = await edit_or_reply(event, "```Unmuting...```")
     user = await get_user_from_event(event)
     user = user[0]
-    if user:
-        pass
-    else:
+    if not user:
         return
 
     if unmute(event.chat_id, user.id) is False:
         return await poppo.edit("`Error! User probably already unmuted.`")
-    else:
+    try:
+        await event.client(EditBannedRequest(event.chat_id, user.id, UNBAN_RIGHTS))
+        await poppo.edit("```Unmuted Successfully```")
+    except UserIdInvalidError:
+        await poppo.edit("`Uh oh my unmute logic broke!`")
+        return
 
-        try:
-            await event.client(EditBannedRequest(event.chat_id, user.id, UNBAN_RIGHTS))
-            await poppo.edit("```Unmuted Successfully```")
-        except UserIdInvalidError:
-            await poppo.edit("`Uh oh my unmute logic broke!`")
-            return
-
-        if BOTLOG:
-            await event.client.send_message(
-                BOTLOG_CHATID,
-                "#UNMUTE\n"
-                f"USER: [{user.first_name}](tg://user?id={user.id})\n"
-                f"CHAT: {event.chat.title}(`{event.chat_id}`)",
-            )
+    if BOTLOG:
+        await event.client.send_message(
+            BOTLOG_CHATID,
+            "#UNMUTE\n"
+            f"USER: [{user.first_name}](tg://user?id={user.id})\n"
+            f"CHAT: {event.chat.title}(`{event.chat_id}`)",
+        )
 
 
 # @register(outgoing=True, pattern="^.adminlist$")
@@ -576,7 +561,7 @@ async def get_admin(event):
             else:
                 mentions += f"\nDeleted Account <code>{user.id}</code>"
     except ChatAdminRequiredError as err:
-        mentions += " " + str(err) + "\n"
+        mentions += f" {str(err)}" + "\n"
     await poppo.edit(mentions, parse_mode="html")
 
 
@@ -602,11 +587,7 @@ async def pin(event):
 
     options = event.pattern_match.group(1)
 
-    is_silent = True
-
-    if options.lower() == "loud":
-        is_silent = False
-
+    is_silent = options.lower() != "loud"
     try:
         await event.client(UpdatePinnedMessageRequest(event.to_id, to_pin, is_silent))
     except BadRequestError:
@@ -657,7 +638,7 @@ async def kick(event):
         await event.client.kick_participant(event.chat_id, user.id)
         await sleep(0.5)
     except Exception as e:
-        await poppo.edit(NO_PERM + f"\n{str(e)}")
+        await poppo.edit(f"{NO_PERM}\n{str(e)}")
         return
 
     if reason:
@@ -688,7 +669,7 @@ async def get_users(event):
     """ For .users command, list all of the users in a chat. """
     info = await event.client.get_entity(event.chat_id)
     title = info.title if info.title else "this chat"
-    mentions = "Users in {}: \n".format(title)
+    mentions = f"Users in {title}: \n"
     try:
         if not event.pattern_match.group(1):
             async for user in event.client.iter_participants(event.chat_id):
@@ -710,18 +691,17 @@ async def get_users(event):
                 else:
                     mentions += f"\nDeleted Account `{user.id}`"
     except ChatAdminRequiredError as err:
-        mentions += " " + str(err) + "\n"
+        mentions += f" {str(err)}" + "\n"
     try:
         poppo = await edit_or_reply(event, mentions)
     except MessageTooLongError:
         poppo = await edit_or_reply(event, "Damn, this is a huge group. Uploading users lists as file.")
-        file = open("userslist.txt", "w+")
-        file.write(mentions)
-        file.close()
+        with open("userslist.txt", "w+") as file:
+            file.write(mentions)
         await event.client.send_file(
             event.chat_id,
             "userslist.txt",
-            caption="Users in {}".format(title),
+            caption=f"Users in {title}",
             reply_to=event.id,
         )
         remove("userslist.txt")
@@ -791,9 +771,8 @@ async def on_snip(event):
     if event.chat_id in last_triggered_filters:
         if name in last_triggered_filters[event.chat_id]:
             return False
-        
-    snips = get_all_filters(event.chat_id)
-    if snips:
+
+    if snips := get_all_filters(event.chat_id):
         for snip in snips:
             pattern = r"( |^|[^\w])" + re.escape(snip.keyword) + r"( |$|[^\w])"
             if re.search(pattern, name, flags=re.IGNORECASE):
@@ -907,13 +886,12 @@ async def on_all_snip_delete(event):
         return
     edit_or_reply(event, "Processing....")
     remove_all_filters(event.chat_id)
-    await event.edit(f"filters **in current chat** deleted successfully")
+    await event.edit("filters **in current chat** deleted successfully")
     
 @friday.on(events.NewMessage(pattern=r"\#(\S+)", outgoing=True))
 async def on_snip(event):
     name = event.pattern_match.group(1)
-    snip = get_snips(name)
-    if snip:
+    if snip := get_snips(name):
         if snip.snip_type == TYPE_PHOTO:
             media = types.InputPhoto(
                 int(snip.media_id),
@@ -1005,7 +983,7 @@ async def on_snip_delete(event):
         return
     name = event.pattern_match.group(1)
     remove_snip(name)
-    await event.edit("snip #{} deleted successfully".format(name))
+    await event.edit(f"snip #{name} deleted successfully")
 
 @friday.on(friday_on_cmd(pattern="create (b|g|c)(?: |$)(.*)"))
 async def telegraphs(grop):
@@ -1050,24 +1028,22 @@ async def telegraphs(grop):
                 )
 
                 await grop.edit(
-                    "Your `{}` Group Made Boss!. Join [{}]({})".format(
-                        group_name, group_name, result.link
-                    )
+                    f"Your `{group_name}` Group Made Boss!. Join [{group_name}]({result.link})"
                 )
 
             except Exception as e:  # pylint:disable=C0103,W0703
 
                 await grop.edit(str(e))
 
-        elif type_of_group == "g" or type_of_group == "c":
+        elif type_of_group in ["g", "c"]:
 
             try:
 
                 r = await grop.client(
-                    functions.channels.CreateChannelRequest(  # pylint:disable=E0602
+                    functions.channels.CreateChannelRequest(
                         title=group_name,
                         about="Welcome to this Channel boss",
-                        megagroup=False if type_of_group == "c" else True,
+                        megagroup=type_of_group != "c",
                     )
                 )
 
@@ -1080,9 +1056,7 @@ async def telegraphs(grop):
                 )
 
                 await grop.edit(
-                    "Your `{}` Group/Channel Has been made Boss!. Join [{}]({})".format(
-                        group_name, group_name, result.link
-                    )
+                    f"Your `{group_name}` Group/Channel Has been made Boss!. Join [{group_name}]({result.link})"
                 )
 
             except Exception as e:  # pylint:disable=C0103,W0703
@@ -1110,20 +1084,17 @@ async def _s(event):
         sql.reset_warns(user.id, event.chat_id)
         if soft_warn:
             await friday.kick_participant(event.chat_id, user.id)
-            reply = "{} warnings, {} has been kicked!".format(limit, user.id)
-            await event.edit(reply)
+            reply = f"{limit} warnings, {user.id} has been kicked!"
         else:
             await friday.edit_permissions(event.chat_id, user.id, view_messages=False)
-            reply = "{} warnings, {} has been banned!".format(
-                limit, user.id, user.first_name
-            )
-            await event.edit(reply)
+            reply = f"{limit} warnings, {user.id} has been banned!"
+        await event.edit(reply)
         for warn_reason in reasons:
-            reply += "\n - {}".format(warn_reason)
+            reply += f"\n - {warn_reason}"
     else:
-        reply = "{} has {}/{} warnings... watch out!".format(user.id, num_warns, limit)
+        reply = f"{user.id} has {num_warns}/{limit} warnings... watch out!"
         if reason:
-            reply += "\nReason for last warn:\n{}".format(reason)
+            reply += f"\nReason for last warn:\n{reason}"
         await event.edit(reply)
 
 
@@ -1160,19 +1131,13 @@ async def __(event):
         num_warns, reasons = result
         limit, soft_warn = sql.get_warn_setting(event.chat_id)
         if reasons:
-            text = (
-                "This user has {}/{} warnings, for the following reasons: \n\n".format(
-                    num_warns, limit
-                )
-            )
+            text = f"This user has {num_warns}/{limit} warnings, for the following reasons: \n\n"
             for reason in reasons:
-                text += "- {} \n".format(reason)
+                text += f"- {reason} \n"
             await event.edit(text)
         else:
             await event.edit(
-                "User has {}/{} warnings, but no reasons for any of them.".format(
-                    num_warns, limit
-                )
+                f"User has {num_warns}/{limit} warnings, but no reasons for any of them."
             )
     else:
         await event.edit("This user hasn't got any warnings!")
@@ -1185,19 +1150,18 @@ async def m_(event):
     if not event.is_group:
         await event.edit("This Command is Meant To Be Used in Chats/Groups")
         return
-    args = event.pattern_match.group(1)
-    if args:
+    if args := event.pattern_match.group(1):
         if args.isdigit():
             if int(args) < 3:
                 await event.edit("The minimum warn limit is 3!")
             else:
                 sql.set_warn_limit(event.chat_id, int(args))
-                await event.edit("Updated the warn limit to {}".format(args))
+                await event.edit(f"Updated the warn limit to {args}")
         else:
             await event.edit("Give me a number as an arg!")
     else:
         limit, soft_warn = sql.get_warn_setting(event.chat_id)
-        await event.edit("The current warn limit is {}".format(limit))
+        await event.edit(f"The current warn limit is {limit}")
 
 
 @friday.on(friday_on_cmd(pattern="wap ?(.*)"))
@@ -1207,8 +1171,7 @@ async def m_(event):
     if not event.is_group:
         await event.edit("This Command is Meant To Be Used in Chats/groups")
         return
-    args = event.pattern_match.group(1)
-    if args:
+    if args := event.pattern_match.group(1):
         if args.lower() in ("on", "yes"):
             sql.set_warn_strength(event.chat_id, False)
             await event.edit("Too many warns will now result in a ban!")
@@ -1256,8 +1219,7 @@ async def get_user_from_event(event):
 
             if isinstance(probable_user_mention_entity, MessageEntityMentionName):
                 user_id = probable_user_mention_entity.user_id
-                user_obj = await event.client.get_entity(user_id)
-                return user_obj
+                return await event.client.get_entity(user_id)
         try:
             user_obj = await event.client.get_entity(user)
         except (TypeError, ValueError) as err:
@@ -1309,7 +1271,7 @@ async def _(event):
     else:
         await event.edit("reply To Message")
     user_id = replied_user
-    caption = """<a href='tg://user?id={}'>{}</a>""".format(user_id, input_str)
+    caption = f"""<a href='tg://user?id={user_id}'>{input_str}</a>"""
     await event.edit(caption, parse_mode="HTML")
     
 @friday.on(friday_on_cmd("get_bot ?(.*)"))
@@ -1323,7 +1285,7 @@ async def _(event):
     if not input_str:
         chat = to_write_chat
     else:
-        mentions = "Bots in {} channel: \n".format(input_str)
+        mentions = f"Bots in {input_str} channel: \n"
         try:
             chat = await borg.get_entity(input_str)
         except Exception as e:
@@ -1332,69 +1294,62 @@ async def _(event):
     try:
         async for x in borg.iter_participants(chat, filter=ChannelParticipantsBots):
             if isinstance(x.participant, ChannelParticipantAdmin):
-                mentions += "\n ⚜️ [{}](tg://user?id={}) `{}`".format(
-                    x.first_name, x.id, x.id
-                )
+                mentions += f"\n ⚜️ [{x.first_name}](tg://user?id={x.id}) `{x.id}`"
             else:
-                mentions += "\n [{}](tg://user?id={}) `{}`".format(
-                    x.first_name, x.id, x.id
-                )
+                mentions += f"\n [{x.first_name}](tg://user?id={x.id}) `{x.id}`"
     except Exception as e:
-        mentions += " " + str(e) + "\n"
+        mentions += f" {str(e)}" + "\n"
     await event.edit(mentions)
     
 @bot.on(events.ChatAction())  # pylint:disable=E0602
 async def _(event):
-    cws = get_current_welcome_settings(event.chat_id)
-    if cws:
-        # logger.info(event.stringify())
-        """user_added=False,
+    if not (cws := get_current_welcome_settings(event.chat_id)):
+        return
+    # logger.info(event.stringify())
+    """user_added=False,
         user_joined=True,
         user_left=False,
         user_kicked=False,"""
-        if event.user_joined:
-            if cws.should_clean_welcome:
-                try:
-                    await bot.delete_messages(  # pylint:disable=E0602
-                        event.chat_id, cws.previous_welcome
-                    )
-                except Exception as e:  # pylint:disable=C0103,W0703
-                    logger.warn(str(e))  # pylint:disable=E0602
-            a_user = await event.get_user()
-            chat = await event.get_chat()
-            me = await bot.get_me()
+    if event.user_joined:
+        if cws.should_clean_welcome:
+            try:
+                await bot.delete_messages(  # pylint:disable=E0602
+                    event.chat_id, cws.previous_welcome
+                )
+            except Exception as e:  # pylint:disable=C0103,W0703
+                logger.warn(str(e))  # pylint:disable=E0602
+        a_user = await event.get_user()
+        chat = await event.get_chat()
+        me = await bot.get_me()
 
-            title = chat.title if chat.title else "this chat"
-            participants = await event.client.get_participants(chat)
-            count = len(participants)
-            mention = "[{}](tg://user?id={})".format(a_user.first_name, a_user.id)
-            first = a_user.first_name
-            last = a_user.last_name
-            if last:
-                fullname = f"{first} {last}"
-            else:
-                fullname = first
-            username = (
-                f"@{me.username}" if me.username else f"[Me](tg://user?id={me.id})"
-            )
-            userid = a_user.id
-            current_saved_welcome_message = cws.custom_welcome_message
-            mention = "[{}](tg://user?id={})".format(a_user.first_name, a_user.id)
+        title = chat.title if chat.title else "this chat"
+        participants = await event.client.get_participants(chat)
+        count = len(participants)
+        mention = f"[{a_user.first_name}](tg://user?id={a_user.id})"
+        first = a_user.first_name
+        last = a_user.last_name
+        fullname = f"{first} {last}" if last else first
+        username = (
+            f"@{me.username}" if me.username else f"[Me](tg://user?id={me.id})"
+        )
+        userid = a_user.id
+        current_saved_welcome_message = cws.custom_welcome_message
+        mention = f"[{a_user.first_name}](tg://user?id={a_user.id})"
 
-            current_message = await event.reply(
-                current_saved_welcome_message.format(
-                    mention=mention,
-                    title=title,
-                    count=count,
-                    first=first,
-                    last=last,
-                    fullname=fullname,
-                    username=username,
-                    userid=userid,
-                ),
-                file=cws.media_file_id,
-            )
-            update_previous_welcome(event.chat_id, current_message.id)
+        current_message = await event.reply(
+            current_saved_welcome_message.format(
+                mention=mention,
+                title=title,
+                count=count,
+                first=first,
+                last=last,
+                fullname=fullname,
+                username=username,
+                userid=userid,
+            ),
+            file=cws.media_file_id,
+        )
+        update_previous_welcome(event.chat_id, current_message.id)
 
 
 @friday.on(friday_on_cmd(pattern="savewelcome"))
@@ -1405,11 +1360,11 @@ async def _(event):
     if msg and msg.media:
         bot_api_file_id = pack_bot_file_id(msg.media)
         add_welcome_setting(event.chat_id, msg.message, True, 0, bot_api_file_id)
-        await event.edit("Welcome note saved. ")
     else:
         input_str = event.text.split(None, 1)
         add_welcome_setting(event.chat_id, input_str[1], True, 0, None)
-        await event.edit("Welcome note saved. ")
+
+    await event.edit("Welcome note saved. ")
 
 
 @friday.on(friday_on_cmd(pattern="clearwelcome$"))  # pylint:disable=E0602
@@ -1419,8 +1374,7 @@ async def _(event):
     cws = get_current_welcome_settings(event.chat_id)
     rm_welcome_setting(event.chat_id)
     await event.edit(
-        "Welcome note cleared. "
-        + "The previous welcome message was `{}`.".format(cws.custom_welcome_message)
+        f"Welcome note cleared. The previous welcome message was `{cws.custom_welcome_message}`."
     )
 
 
@@ -1431,8 +1385,7 @@ async def _(event):
     cws = get_current_welcome_settings(event.chat_id)
     if hasattr(cws, "custom_welcome_message"):
         await event.edit(
-            "Welcome note found. "
-            + "Your welcome message is\n\n`{}`.".format(cws.custom_welcome_message)
+            f"Welcome note found. Your welcome message is\n\n`{cws.custom_welcome_message}`."
         )
     else:
         await event.edit("No Welcome Message found")

@@ -16,10 +16,10 @@ async def gsearch(q_event):
     try:
         page = page[0]
         page = page.replace("page=", "")
-        match = match.replace("page=" + page[0], "")
+        match = match.replace(f"page={page[0]}", "")
     except IndexError:
         page = 1
-    search_args = (str(match), int(page))
+    search_args = str(match), page
     gsearch = GoogleSearch()
     gresults = await gsearch.async_search(*search_args)
     msg = ""

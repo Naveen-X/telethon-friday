@@ -17,9 +17,7 @@ logging.basicConfig(
 
 def progress(current, total):
     logger.info(
-        "Downloaded {} of {}\nCompleted {}".format(
-            current, total, (current / total) * 100
-        )
+        f"Downloaded {current} of {total}\nCompleted {current / total * 100}"
     )
 
 
@@ -31,8 +29,7 @@ async def _(event):
     datetime.now()
     if not os.path.isdir(Config.TMP_DOWNLOAD_DIRECTORY):
         os.makedirs(Config.TMP_DOWNLOAD_DIRECTORY)
-    input_str = event.pattern_match.group(1)
-    if input_str:
+    if input_str := event.pattern_match.group(1):
         message = input_str
     elif event.reply_to_msg_id:
         previous_message = await event.get_reply_message()
@@ -45,16 +42,12 @@ async def _(event):
             m_list = None
             with open(downloaded_file_name, "rb") as fd:
                 m_list = fd.readlines()
-            message = ""
-            for m in m_list:
-                # message += m.decode("UTF-8") + "\r\n"
-                message += m.decode("UTF-8")
+            message = "".join(m.decode("UTF-8") for m in m_list)
             os.remove(downloaded_file_name)
         else:
             message = previous_message.message
     else:
         await event.edit("Give Some Text Or File To Paste")
-    py_file = ""
     name = "ok"
     if previous_message.media:
         name = await borg.download_media(
@@ -62,7 +55,7 @@ async def _(event):
         )
     downloaded_file_name = name
     if downloaded_file_name.endswith(".py"):
-        py_file += ".py"
+        py_file = "" + ".py"
         data = message
         key = (
             requests.post("https://nekobin.com/api/documents", json={"content": data})
@@ -72,8 +65,6 @@ async def _(event):
         )
         url = f"https://nekobin.com/{key}{py_file}"
         raw = f"https://nekobin.com/raw/{key}{py_file}"
-        reply_text = f"Pasted Text [neko]({url})\n Raw ? [View Raw]({raw})"
-        await event.edit(reply_text)
     else:
         data = message
         key = (
@@ -84,8 +75,9 @@ async def _(event):
         )
         url = f"https://nekobin.com/{key}"
         raw = f"https://nekobin.com/raw/{key}"
-        reply_text = f"Pasted Text [neko]({url})\n Raw ? [View Raw]({raw})"
-        await event.edit(reply_text)
+
+    reply_text = f"Pasted Text [neko]({url})\n Raw ? [View Raw]({raw})"
+    await event.edit(reply_text)
 
 
 CMD_HELP.update(

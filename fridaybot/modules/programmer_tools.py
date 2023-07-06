@@ -30,7 +30,7 @@ async def __(event):
     if event.fwd_from:
         return
     query = event.pattern_match.group(1)
-    if query == None:
+    if query is None:
         await event.edit("`Give Some Query First`")
         return
     output = howdoi.howdoi(query)

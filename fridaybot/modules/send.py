@@ -16,9 +16,9 @@ async def send(event):
     input_str = event.pattern_match.group(1)
     start = datetime.now()
     if input_str.endswith(".py"):
-        the_plugin_file = "./fridaybot/modules/{}".format(input_str)
+        the_plugin_file = f"./fridaybot/modules/{input_str}"
     else:
-        the_plugin_file = "./fridaybot/modules/{}.py".format(input_str)
+        the_plugin_file = f"./fridaybot/modules/{input_str}.py"
     end = datetime.now()
     (end - start).seconds
     men = f"**Plugin Name :** `{input_str}` \n**This Plugin is Part Of Friday, Please Read License Before Using In Your Projects.**"

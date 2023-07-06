@@ -27,12 +27,11 @@ from uniborg.util import friday_on_cmd
 async def nsfw(event):
     if event.fwd_from:
         return
-    url = "https://nsfw-categorize.it/api/upload"
     await event.edit("`Processing..`")
     sed = await event.get_reply_message()
     photo = None
-    sedpath = "./fridaydevs/"
     if sed and sed.media:
+        sedpath = "./fridaydevs/"
         if isinstance(sed.media, MessageMediaPhoto):
             photo = await borg.download_media(sed.media, sedpath)
         elif "image" in sed.media.document.mime_type.split("/"):
@@ -42,6 +41,7 @@ async def nsfw(event):
             return
     if photo:
         files = {"image": (f"{photo}", open(f"{photo}", "rb"))}
+        url = "https://nsfw-categorize.it/api/upload"
         r = requests.post(url, files=files).json()
         if r["status"] == "OK":
             await event.edit(

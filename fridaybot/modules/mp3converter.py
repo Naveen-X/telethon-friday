@@ -36,19 +36,16 @@ async def _(event):
     else:
         end = datetime.now()
         ms = (end - start).seconds
-        await event.edit(
-            "Downloaded to `{}` in {} seconds.".format(downloaded_file_name, ms)
-        )
+        await event.edit(f"Downloaded to `{downloaded_file_name}` in {ms} seconds.")
         new_required_file_name = ""
         new_required_file_caption = ""
         command_to_run = []
-        force_document = False
         voice_note = False
         supports_streaming = False
         if input_str == "voice":
-            new_required_file_caption = "AUDIO" + str(round(time.time())) + ".opus"
+            new_required_file_caption = f"AUDIO{str(round(time.time()))}.opus"
             new_required_file_name = (
-                Config.TMP_DOWNLOAD_DIRECTORY + "/" + new_required_file_caption
+                f"{Config.TMP_DOWNLOAD_DIRECTORY}/{new_required_file_caption}"
             )
             command_to_run = [
                 "ffmpeg",
@@ -67,9 +64,9 @@ async def _(event):
             voice_note = True
             supports_streaming = True
         elif input_str == "mp3":
-            new_required_file_caption = "AUDIO" + str(round(time.time())) + ".mp3"
+            new_required_file_caption = f"AUDIO{str(round(time.time()))}.mp3"
             new_required_file_name = (
-                Config.TMP_DOWNLOAD_DIRECTORY + "/" + new_required_file_caption
+                f"{Config.TMP_DOWNLOAD_DIRECTORY}/{new_required_file_caption}"
             )
             command_to_run = [
                 "ffmpeg",
@@ -99,6 +96,7 @@ async def _(event):
         os.remove(downloaded_file_name)
         if os.path.exists(new_required_file_name):
             end_two = datetime.now()
+            force_document = False
             await borg.send_file(
                 entity=event.chat_id,
                 file=new_required_file_name,

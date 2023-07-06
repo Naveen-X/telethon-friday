@@ -15,9 +15,7 @@ from fridaybot import CMD_HELP
 
 def progress(current, total):
     logger.info(
-        "Downloaded {} of {}\nCompleted {}".format(
-            current, total, (current / total) * 100
-        )
+        f"Downloaded {current} of {total}\nCompleted {current / total * 100}"
     )
 
 
@@ -39,7 +37,7 @@ async def _(event):
         "-X",
         "POST",
         "-F",
-        "f=@" + downloaded_file_name + "",
+        f"f=@{downloaded_file_name}",
         "https://zxing.org/w/decode",
     ]
     process = await asyncio.create_subprocess_exec(
@@ -62,9 +60,7 @@ async def _(event):
     qr_contents = soup.find_all("pre")[0].text
     end = datetime.now()
     ms = (end - start).seconds
-    await event.edit(
-        "Obtained QRCode contents in {} seconds.\n{}".format(ms, qr_contents)
-    )
+    await event.edit(f"Obtained QRCode contents in {ms} seconds.\n{qr_contents}")
     await asyncio.sleep(5)
     await event.edit(qr_contents)
 
@@ -91,9 +87,7 @@ async def _(event):
             m_list = None
             with open(downloaded_file_name, "rb") as fd:
                 m_list = fd.readlines()
-            message = ""
-            for m in m_list:
-                message += m.decode("UTF-8") + "\r\n"
+            message = "".join(m.decode("UTF-8") + "\r\n" for m in m_list)
             os.remove(downloaded_file_name)
         else:
             message = previous_message.message
@@ -119,7 +113,7 @@ async def _(event):
     os.remove("img_file.webp")
     end = datetime.now()
     ms = (end - start).seconds
-    await event.edit("Created QRCode in {} seconds".format(ms))
+    await event.edit(f"Created QRCode in {ms} seconds")
     await asyncio.sleep(5)
     await event.delete()
 

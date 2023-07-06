@@ -16,13 +16,10 @@ async def _(event):
     if event.fwd_from:
         return
     input_str = event.pattern_match.group(1)
-    sample_url = "https://da.gd/s?url=https://lmgtfy.com/?q={}%26iie=1".format(
-        input_str.replace(" ", "+")
-    )
-    response_api = requests.get(sample_url).text
-    if response_api:
+    sample_url = f'https://da.gd/s?url=https://lmgtfy.com/?q={input_str.replace(" ", "+")}%26iie=1'
+    if response_api := requests.get(sample_url).text:
         await event.edit(
-            "[{}]({})\n`Thank me Later 🙃` ".format(input_str, response_api.rstrip())
+            f"[{input_str}]({response_api.rstrip()})\n`Thank me Later 🙃` "
         )
     else:
         await event.edit("something is wrong. please try again later.")

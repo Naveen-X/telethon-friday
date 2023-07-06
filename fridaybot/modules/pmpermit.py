@@ -11,12 +11,11 @@ from fridaybot.Configs import Config
 from fridaybot.function import is_nsfw
 from fridaybot.utils import friday_on_cmd
 
-PMPERMIT_PIC = os.environ.get("PMPERMIT_PIC", None)
-if not PMPERMIT_PIC:
-    WARN_PIC = "https://telegra.ph/file/53aed76a90e38779161b1.jpg"
-else:
+if PMPERMIT_PIC := os.environ.get("PMPERMIT_PIC", None):
     WARN_PIC = PMPERMIT_PIC
 
+else:
+    WARN_PIC = "https://telegra.ph/file/53aed76a90e38779161b1.jpg"
 PM_WARNS = {}
 PREV_REPLY_MESSAGE = {}
 
@@ -48,7 +47,7 @@ async def approve_p_m(event):
         firstname = replied_user.user.first_name
         if pmpermit_sql.is_approved(event.chat_id):
             pmpermit_sql.disapprove(event.chat_id)
-        await event.edit("Blocked [{}](tg://user?id={})".format(firstname, event.chat_id))
+        await event.edit(f"Blocked [{firstname}](tg://user?id={event.chat_id})")
         await event.client(functions.contacts.BlockRequest(event.chat_id))
     elif event.is_group:
         reply_s = await event.get_reply_message()
@@ -59,7 +58,7 @@ async def approve_p_m(event):
         firstname = replied_user.user.first_name
         if pmpermit_sql.is_approved(event.chat_id):
             pmpermit_sql.disapprove(event.chat_id)
-        await event.edit("Blocked [{}](tg://user?id={})".format(firstname, reply_s.sender_id))
+        await event.edit(f"Blocked [{firstname}](tg://user?id={reply_s.sender_id})")
         await event.client(functions.contacts.BlockRequest(reply_s.sender_id))
         await asyncio.sleep(3)
         await event.delete()
@@ -84,7 +83,7 @@ if PM_ON_OFF != "DISABLE":
         if PM_ON_OFF == "DISABLE":
             return
         if not pmpermit_sql.is_approved(event.chat_id):
-            if not event.chat_id in PM_WARNS:
+            if event.chat_id not in PM_WARNS:
                 pmpermit_sql.approve(event.chat_id, "outgoing")
                 
     @borg.on(friday_on_cmd(pattern="(a|approve|allow)$"))
@@ -101,9 +100,7 @@ if PM_ON_OFF != "DISABLE":
                     await PREV_REPLY_MESSAGE[event.chat_id].delete()
                     del PREV_REPLY_MESSAGE[event.chat_id]
                 pmpermit_sql.approve(event.chat_id, "Approved Another Nibba")
-                await event.edit(
-                    "Approved to pm [{}](tg://user?id={})".format(firstname, event.chat_id)
-                )
+                await event.edit(f"Approved to pm [{firstname}](tg://user?id={event.chat_id})")
                 await asyncio.sleep(3)
                 await event.delete()
             elif pmpermit_sql.is_approved(event.chat_id):
@@ -120,8 +117,8 @@ if PM_ON_OFF != "DISABLE":
                 firstname = replied_user.user.first_name
                 pmpermit_sql.approve(reply_s.sender_id, "Approved Another Nibba")
                 await event.edit(
-                        "Approved to pm [{}](tg://user?id={})".format(firstname, reply_s.sender_id)
-                    )
+                    f"Approved to pm [{firstname}](tg://user?id={reply_s.sender_id})"
+                )
                 await asyncio.sleep(3)
                 await event.delete()
             elif pmpermit_sql.is_approved(reply_s.sender_id):
@@ -138,7 +135,7 @@ if PM_ON_OFF != "DISABLE":
             if pmpermit_sql.is_approved(event.chat_id):
                 pmpermit_sql.disapprove(event.chat_id)
                 await event.edit(
-                    "Disapproved User [{}](tg://user?id={})".format(firstname, event.chat_id)
+                    f"Disapproved User [{firstname}](tg://user?id={event.chat_id})"
                 )
                 await asyncio.sleep(3)
                 await event.delete()
@@ -156,7 +153,7 @@ if PM_ON_OFF != "DISABLE":
                 firstname = replied_user.user.first_name
                 pmpermit_sql.disapprove(reply_s.sender_id)
                 await event.edit(
-                    "Disapproved User [{}](tg://user?id={})".format(firstname, reply_s.sender_id)
+                    f"Disapproved User [{firstname}](tg://user?id={reply_s.sender_id})"
                 )
                 await asyncio.sleep(3)
                 await event.delete()
@@ -232,10 +229,9 @@ if PM_ON_OFF != "DISABLE":
                 if hehe is True:
                     await event.client.send_message(chat_ids, "`How Dare You Send Nsfw In My Masters Pm, You Have Been Blocked By FridayUserBot !`")
                     await event.client(functions.contacts.BlockRequest(chat_ids))
-                    _message = ""
-                    _message += "#BLOCKED_PM_NSFW\n\n"
+                    _message = "" + "#BLOCKED_PM_NSFW\n\n"
                     _message += f"[User](tg://user?id={chat_ids}): {chat_ids}\n"
-                    _message += f"**This Asshole Sent Nsfw Contect in Your Pm**"
+                    _message += "**This Asshole Sent Nsfw Contect in Your Pm**"
                     try:
                         await event.client.send_message(
                             entity=Config.PRIVATE_GROUP_ID,
@@ -254,8 +250,7 @@ if PM_ON_OFF != "DISABLE":
             if chat_ids in PREV_REPLY_MESSAGE:
                 await PREV_REPLY_MESSAGE[chat_ids].delete()
             PREV_REPLY_MESSAGE[chat_ids] = r
-            the_message = ""
-            the_message += "#BLOCKED_PMs\n\n"
+            the_message = "" + "#BLOCKED_PMs\n\n"
             the_message += f"[User](tg://user?id={chat_ids}): {chat_ids}\n"
             the_message += f"Message Counts: {PM_WARNS[chat_ids]}\n"
             try:

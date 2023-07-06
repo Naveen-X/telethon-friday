@@ -36,77 +36,52 @@ Error:   {pokemon.get("error")}"""
     number = str(pokemon.get("number"))
     species = str(pokemon.get("species"))
     typo = pokemon.get("types")
-    types = ""
-    for tu in typo:
-        types += str(tu) + ",  "
-
+    types = "".join(f"{str(tu)},  " for tu in typo)
     lol = pokemon.get("abilities")
     lmao = lol.get("normal")
     ok = ""
     for ty in lmao:
-        ok = str(ty) + ",  "
+        ok = f"{str(ty)},  "
 
     kk = lol.get("hidden")
-    hm = ""
-    for pq in kk:
-        hm += str(pq) + ",  "
+    hm = "".join(f"{str(pq)},  " for pq in kk)
     hell = pokemon.get("eggGroups")
-    uio = ""
-    for x in hell:
-        uio += str(x) + ",  "
-
+    uio = "".join(f"{str(x)},  " for x in hell)
     height = pokemon.get("height")
     weight = pokemon.get("weight")
     yes = pokemon.get("family")
     Id = str(yes.get("id"))
     evo = str(yes.get("evolutionStage"))
     pol = yes.get("evolutionLine")
-    xy = ""
-    for p in pol:
-        xy += str(p) + ",  "
-
+    xy = "".join(f"{str(p)},  " for p in pol)
     start = pokemon.get("starter")
     if start == False:
         start = "No"
     elif start == True:
         start = "True"
-    else:
-        pass
-
     leg = pokemon.get("legendary")
 
     if leg == False:
         leg = "No"
     elif leg == True:
         leg = "True"
-    else:
-        pass
-
     myt = pokemon.get("mythical")
     if myt == False:
         myt = "No"
     elif myt == True:
         myt = "True"
-    else:
-        pass
     ultra = pokemon.get("ultraBeast")
 
     if ultra == False:
         ultra = "No"
     elif ultra == True:
         ultra = "True"
-    else:
-        pass
-
     megA = pokemon.get("mega")
 
     if megA == False:
         megA = "No"
     elif megA == True:
         megA = "True"
-    else:
-        pass
-
     gEn = pokemon.get("gen")
     link = pokemon.get("sprite")
     des = pokemon.get("description")

@@ -29,9 +29,8 @@ async def _(event):
     input_str = event.pattern_match.group(1)
     lool = 0
     KkK = await edit_or_reply(event, "searching for the book...")
-    lin = "https://b-ok.cc/s/"
     text = input_str
-    link = lin+text
+    link = f"https://b-ok.cc/s/{text}"
 
     headers = ['User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:74.0) Gecko/20100101 Firefox/74.0']
     page = requests.get(link)
@@ -51,7 +50,7 @@ async def _(event):
                     lool = lool+1
                 for ts in td.find_all('a', attrs={'href': re.compile("^/book/")}):
                     ref = (ts.get('href'))
-                    link = "https://b-ok.cc" + ref
+                    link = f"https://b-ok.cc{ref}"
 
                 f.write("\n"+title)
                 f.write("\nBook link:- " + link+"\n\n")
@@ -59,7 +58,7 @@ async def _(event):
         f.write("By Friday.")
         f.close()
         caption="By Friday.\n Get Your Friday From @FRIDAYCHAT"
-        
+
         await borg.send_file(event.chat_id, "book.txt", caption=f"**BOOKS GATHERED SUCCESSFULLY!\n\nBY FRIDAY. GET YOUR OWN FRIDAY FROM @FRIDAYCHAT.**")
         os.remove("book.txt")
         await KkK.delete()

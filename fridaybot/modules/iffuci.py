@@ -11,9 +11,7 @@ from fridaybot.utils import edit_or_reply, friday_on_cmd, sudo_cmd
 
 def progress(current, total):
     logger.info(
-        "Downloaded {} of {}\nCompleted {}".format(
-            current, total, (current / total) * 100
-        )
+        f"Downloaded {current} of {total}\nCompleted {current / total * 100}"
     )
 
 
@@ -41,9 +39,7 @@ async def _(event):
             m_list = None
             with open(downloaded_file_name, "rb") as fd:
                 m_list = fd.readlines()
-            message = ""
-            for m in m_list:
-                message += m.decode("UTF-8") + "\r\n"
+            message = "".join(m.decode("UTF-8") + "\r\n" for m in m_list)
             os.remove(downloaded_file_name)
         else:
             message = previous_message.message
@@ -57,9 +53,7 @@ async def _(event):
     if r["isUrl"]:
         nurl = f"https://iffuci.tk/v/{r['key']}"
         await crackexy.edit(
-            "code is pasted to {} in {} seconds. GoTo Original URL: {}".format(
-                url, ms, nurl
-            )
+            f"code is pasted to {url} in {ms} seconds. GoTo Original URL: {nurl}"
         )
     else:
-        await crackexy.edit("code is pasted to {} in {} seconds".format(url, ms))
+        await crackexy.edit(f"code is pasted to {url} in {ms} seconds")

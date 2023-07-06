@@ -43,11 +43,7 @@ LOG_CHAT = Config.PRIVATE_GROUP_ID
 DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else "Friday"
 
 HELP_EMOJI = os.environ.get("HELP_EMOJI", None)
-if not HELP_EMOJI:
-    emji = "✘"
-else:
-    emji = HELP_EMOJI
-    
+emji = "✘" if not HELP_EMOJI else HELP_EMOJI
 db_m = TinyDB('secret.json')
 db_s = TinyDB('not4u.json')
 
@@ -63,7 +59,7 @@ async def inline_handler(event):
         buttons = paginate_help(0, CMD_HELP, "helpme")
         result = builder.article(
             "© Userbot Help",
-            text="{}\nCurrently Loaded Plugins: {}".format(query, len(CMD_LIST)),
+            text=f"{query}\nCurrently Loaded Plugins: {len(CMD_LIST)}",
             buttons=buttons,
             link_preview=False,
         )
@@ -212,7 +208,7 @@ async def on_plug_in_callback_query_handler(event):
 )
 async def on_plug_in_callback_query_handler(event):
     o = await all_pro_s(Config, client1, client2, client3)
-    if not event.query.user_id in o:
+    if event.query.user_id not in o:
         sedok = "Who The Fuck Are You? Get Your Own Friday."
         await event.answer(sedok, cache_time=0, alert=True)
         return
@@ -257,7 +253,7 @@ async def rip(event):
     yt_dl_data = event.data_match.group(1).decode("UTF-8")
     link_s = yt_dl_data
     if event.query.user_id not in o:
-        text = f"Please Get Your Own Friday And Don't Waste My Resources"
+        text = "Please Get Your Own Friday And Don't Waste My Resources"
         await event.answer(text, alert=True)
         return
     is_it = True
@@ -269,7 +265,7 @@ async def rip(event):
     sun = event.data_match.group(1).decode("UTF-8")
     o = await all_pro_s(Config, client1, client2, client3)
     if event.query.user_id not in o:
-        text = f"Please Get Your Own Friday And Don't Waste My Resources"
+        text = "Please Get Your Own Friday And Don't Waste My Resources"
         await event.answer(text, alert=True)
         return
     ok = await _deezer_dl(sun, event, tgbot)
@@ -282,7 +278,7 @@ async def rip(event):
     o = await all_pro_s(Config, client1, client2, client3)
     link_s = yt_dl_data
     if event.query.user_id not in o:
-        text = f"Please Get Your Own Friday And Don't Waste My Resources"
+        text = "Please Get Your Own Friday And Don't Waste My Resources"
         await event.answer(text, alert=True)
         return
     is_it = False
@@ -366,14 +362,11 @@ async def rip(event):
 def paginate_help(page_number, loaded_modules, prefix):
     number_of_rows = 8
     number_of_cols = 2
-    helpable_modules = []
-    for p in loaded_modules:
-        if not p.startswith("_"):
-            helpable_modules.append(p)
+    helpable_modules = [p for p in loaded_modules if not p.startswith("_")]
     helpable_modules = sorted(helpable_modules)
     modules = [
         custom.Button.inline(
-            "{} {} {}".format(emji, x, emji), data="us_plugin_{}|{}".format(x, page_number)
+            f"{emji} {x} {emji}", data=f"us_plugin_{x}|{page_number}"
         )
         for x in helpable_modules
     ]
@@ -388,11 +381,11 @@ def paginate_help(page_number, loaded_modules, prefix):
         ] + [
             (
                 custom.Button.inline(
-                    "⏪ Previous", data="{}_prev({})".format(prefix, modulo_page)
+                    "⏪ Previous", data=f"{prefix}_prev({modulo_page})"
                 ),
                 custom.Button.inline("Close", data="cleuse"),
                 custom.Button.inline(
-                    "Next ⏩", data="{}_next({})".format(prefix, modulo_page)
+                    "Next ⏩", data=f"{prefix}_next({modulo_page})"
                 ),
             )
         ]
@@ -517,11 +510,11 @@ async def inline_id_handler(event: events.InlineQuery.Event):
     try:
         page = page[0]
         page = page.replace("page=", "")
-        match = match.replace("page=" + page[0], "")
+        match = match.replace(f"page={page[0]}", "")
     except IndexError:
         page = 1
-    
-    search_args = (str(match), int(page))
+
+    search_args = str(match), page
     gsearch = GoogleSearch()
     gresults = await gsearch.async_search(*search_args)
     msg = ""
@@ -610,14 +603,14 @@ async def inline_id_handler(event: events.InlineQuery.Event):
     if xkcd_id is None:
         xkcd_url = "https://xkcd.com/info.0.json"
     else:
-        xkcd_url = "https://xkcd.com/{}/info.0.json".format(xkcd_id)
+        xkcd_url = f"https://xkcd.com/{xkcd_id}/info.0.json"
     r = requests.get(xkcd_url)
     if r.ok:
         data = r.json()
         year = data.get("year")
         month = data["month"].zfill(2)
         day = data["day"].zfill(2)
-        xkcd_link = "https://xkcd.com/{}".format(data.get("num"))
+        xkcd_link = f'https://xkcd.com/{data.get("num")}'
         safe_title = data.get("safe_title")
         data.get("transcript")
         alt = data.get("alt")
@@ -638,10 +631,7 @@ Year: {}""".format(
         )
         await event.answer([lul_k])
     else:
-        resultm = builder.article(
-            title="- No Results :/ -",
-            text=f"No Results Found !"
-        )
+        resultm = builder.article(title="- No Results :/ -", text="No Results Found !")
         await event.answer([resultm])
         
 @tgbot.on(events.InlineQuery(pattern=r"deezer ?(.*)"))

@@ -41,9 +41,7 @@ async def download(event):
         end = datetime.now()
         ms = (end - start).seconds
         await event.delete()
-        await mone.edit(
-            "Downloaded to `{}` in {} seconds.".format(downloaded_file_name, ms)
-        )
+        await mone.edit(f"Downloaded to `{downloaded_file_name}` in {ms} seconds.")
         await mone.edit("Committing to Github....")
         await git_commit(downloaded_file_name, mone)
 
@@ -63,25 +61,23 @@ async def git_commit(file_name, mone):
         print(content_file)
     for i in content_list:
         create_file = True
-        if i == 'ContentFile(path="' + file_name + '")':
+        if i == f'ContentFile(path="{file_name}")':
             return await mone.edit("`File Already Exists`")
-            create_file = False
-    file_name = "userbot/plugins/" + file_name
-    if create_file == True:
-        file_name = file_name.replace("./userbot/temp/", "")
-        print(file_name)
-        try:
-            repo.create_file(
-                file_name, "Uploaded New Plugin", commit_data, branch="master"
-            )
-            print("Committed File")
-            ccess = Var.GIT_REPO_NAME
-            ccess = ccess.strip()
-            await mone.edit(
-                f"`Commited On Your Github Repo`\n\n[Your STDPLUGINS](https://github.com/{ccess}/tree/master/userbot/plugins/)"
-            )
-        except:
-            print("Cannot Create Plugin")
-            await mone.edit("Cannot Upload Plugin")
-    else:
+    file_name = f"userbot/plugins/{file_name}"
+    if create_file != True:
         return await mone.edit("`Committed Suicide`")
+    file_name = file_name.replace("./userbot/temp/", "")
+    print(file_name)
+    try:
+        repo.create_file(
+            file_name, "Uploaded New Plugin", commit_data, branch="master"
+        )
+        print("Committed File")
+        ccess = Var.GIT_REPO_NAME
+        ccess = ccess.strip()
+        await mone.edit(
+            f"`Commited On Your Github Repo`\n\n[Your STDPLUGINS](https://github.com/{ccess}/tree/master/userbot/plugins/)"
+        )
+    except:
+        print("Cannot Create Plugin")
+        await mone.edit("Cannot Upload Plugin")
